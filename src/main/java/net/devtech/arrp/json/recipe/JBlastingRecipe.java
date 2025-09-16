@@ -1,8 +1,10 @@
 package net.devtech.arrp.json.recipe;
 
+import net.minecraft.util.Identifier;
+
 public class JBlastingRecipe extends JCookingRecipe {
 	JBlastingRecipe(final JIngredient ingredient, final JResult result) {
-		super("blasting", ingredient, result);
+		super(Identifier.ofVanilla("blasting"), ingredient, result);
 	}
 
 	@Override

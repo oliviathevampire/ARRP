@@ -1,16 +1,49 @@
 package net.devtech.arrp.json.recipe;
 
-public abstract class JRecipe implements Cloneable {
-	protected final String type;
+import com.mojang.serialization.Codec;
+import net.devtech.arrp.json.codec.Codecs;
+import net.minecraft.util.Identifier;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public abstract class JRecipe implements Cloneable {
+	private static final Map<Identifier, Codec<? extends JRecipe>> REGISTRY = new ConcurrentHashMap<>();
+	public static final Codec<JRecipe> CODEC = Codecs.tagged("type", JRecipe::getType, REGISTRY::get, Identifier.CODEC);
+
+	protected final Identifier type;
 	protected String group;
 
-	JRecipe(final String type) {
+	JRecipe(final Identifier type) {
 		this.type = type;
 	}
 
-	public static JSmithingRecipe smithing(final JIngredient base, final JIngredient addition, final JResult result) {
-		return new JSmithingRecipe(base, addition, result);
+	public static <R extends JRecipe> void register(Identifier type, Codec<R> codec) {
+		REGISTRY.put(type, codec);
+	}
+
+	/** Back-compat alias: old `smithing(...)` now means smithing_transform. */
+	@Deprecated
+	public static JSmithingTransformRecipe smithing(final JIngredient base, final JIngredient addition, final JIngredient template, final JResult result) {
+		return smithingTransform(base, addition, template, result);
+	}
+
+	public static JSmithingTransformRecipe smithingTransform(
+			final JIngredient base, final JIngredient addition, final JIngredient template, final JResult result) {
+		return new JSmithingTransformRecipe(base, addition, template, result);
+	}
+
+	/** Convenience: default base to tag #minecraft:trimmable_armor. */
+	public static JSmithingTrimRecipe smithingTrim(final JIngredient addition, final JIngredient template) {
+		return new JSmithingTrimRecipe(
+				JIngredient.ingredient().tag(Identifier.ofVanilla("trimmable_armor")),
+				addition, template
+		);
+	}
+
+	/** Explicit trim with a given base ingredient. */
+	public static JSmithingTrimRecipe smithingTrim(final JIngredient base, final JIngredient addition, final JIngredient template) {
+		return new JSmithingTrimRecipe(base, addition, template);
 	}
 
 	public static JStonecuttingRecipe stonecutting(final JIngredient ingredient, final JStackedResult result) {
@@ -20,7 +53,7 @@ public abstract class JRecipe implements Cloneable {
 	// crafting
 
 	public static JShapedRecipe shaped(final JPattern pattern, final JKeys keys, final JResult result) {
-		return new JShapedRecipe(result, pattern, keys);
+		return new JShapedRecipe(pattern, keys, result);
 	}
 
 	public static JShapelessRecipe shapeless(final JIngredients ingredients, final JResult result) {
@@ -49,6 +82,14 @@ public abstract class JRecipe implements Cloneable {
 		this.group = group;
 
 		return this;
+	}
+
+	public Identifier getType() {
+		return type;
+	}
+
+	public String getGroup() {
+		return group;
 	}
 
 	@Override

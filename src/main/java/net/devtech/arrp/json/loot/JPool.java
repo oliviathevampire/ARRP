@@ -1,15 +1,40 @@
 package net.devtech.arrp.json.loot;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class JPool implements Cloneable {
+	public static final Codec<JPool> CODEC = RecordCodecBuilder.create(i -> i.group(
+			JCondition.CODEC.listOf().optionalFieldOf("conditions").forGetter(p -> Optional.ofNullable(p.conditions)),
+			JFunction.CODEC.listOf().optionalFieldOf("functions").forGetter(p -> Optional.ofNullable(p.functions)),
+			JEntry.CODEC.listOf().optionalFieldOf("entries").forGetter(p -> Optional.ofNullable(p.entries)),
+			Codec.either(Codec.INT, JRoll.CODEC).optionalFieldOf("rolls").forGetter(p -> Optional.ofNullable(rollsEither(p))),
+			Codec.either(Codec.INT, JRoll.CODEC).optionalFieldOf("bonus_rolls").forGetter(p -> Optional.ofNullable(bonusEither(p)))
+	).apply(i, (ocond, ofunc, oent, orolls, obonus) -> {
+		JPool p = new JPool();
+		p.conditions = ocond.orElse(null);
+		p.functions = ofunc.orElse(null);
+		p.entries = oent.orElse(null);
+		orolls.ifPresent(e -> {
+			if (e.left().isPresent()) p.rolls = e.left().get();
+			else p.roll = e.right().get();
+		});
+		obonus.ifPresent(e -> {
+			if (e.left().isPresent()) p.bonus_rolls = e.left().get();
+			else p.bonus_roll = e.right().get();
+		});
+		return p;
+	}));
 	private List<JCondition> conditions;
 	private List<JFunction> functions;
 	private List<JEntry> entries;
@@ -17,11 +42,23 @@ public class JPool implements Cloneable {
 	private JRoll roll;
 	private Integer bonus_rolls;
 	private JRoll bonus_roll;
-
 	/**
 	 * @see JLootTable#pool()
 	 */
-	public JPool() {}
+	public JPool() {
+	}
+
+	private static Either<Integer, JRoll> rollsEither(JPool p) {
+		if (p.roll != null) return Either.right(p.roll);
+		if (p.rolls != null) return Either.left(p.rolls);
+		return null;
+	}
+
+	private static Either<Integer, JRoll> bonusEither(JPool p) {
+		if (p.bonus_roll != null) return Either.right(p.bonus_roll);
+		if (p.bonus_rolls != null) return Either.left(p.bonus_rolls);
+		return null;
+	}
 
 	public JPool entry(JEntry entry) {
 		if (this.entries == null) {

@@ -1,8 +1,10 @@
 package net.devtech.arrp.json.recipe;
 
+import net.minecraft.util.Identifier;
+
 public class JSmokingRecipe extends JCookingRecipe {
 	JSmokingRecipe(final JIngredient ingredient, final JResult result) {
-		super("smoking", ingredient, result);
+		super(Identifier.ofVanilla("smoking"), ingredient, result);
 	}
 
 	@Override

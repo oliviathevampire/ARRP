@@ -1,11 +1,35 @@
 package net.devtech.arrp.json.loot;
 
-import net.devtech.arrp.impl.RuntimeResourcePackImpl;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JEntry implements Cloneable {
+	public static final Codec<JEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
+			Codec.STRING.optionalFieldOf("type").forGetter(e -> java.util.Optional.ofNullable(e.type)),
+			Codec.STRING.optionalFieldOf("name").forGetter(e -> java.util.Optional.ofNullable(e.name)),
+			Codec.BOOL.optionalFieldOf("expand").forGetter(e -> java.util.Optional.ofNullable(e.expand)),
+			JFunction.CODEC.listOf().optionalFieldOf("functions").forGetter(e -> java.util.Optional.ofNullable(e.functions)),
+			JCondition.CODEC.listOf().optionalFieldOf("conditions").forGetter(e -> java.util.Optional.ofNullable(e.conditions)),
+			Codec.INT.optionalFieldOf("weight").forGetter(e -> java.util.Optional.ofNullable(e.weight)),
+			Codec.INT.optionalFieldOf("quality").forGetter(e -> java.util.Optional.ofNullable(e.quality)),
+			// recursive: children
+			Codec.lazyInitialized(() -> JEntry.CODEC).listOf().optionalFieldOf("children")
+					.forGetter(e -> java.util.Optional.ofNullable(e.children))
+	).apply(i, (otype, oname, oexp, ofunc, ocond, oweight, oqual, och) -> {
+		JEntry e = new JEntry();
+		e.type = otype.orElse(null);
+		e.name = oname.orElse(null);
+		e.expand = oexp.orElse(null);
+		e.functions = ofunc.orElse(null);
+		e.conditions = ocond.orElse(null);
+		e.weight = oweight.orElse(null);
+		e.quality = oqual.orElse(null);
+		e.children = och.orElse(null);
+		return e;
+	}));
 	private String type;
 	private String name;
 	private List<JEntry> children;
@@ -39,15 +63,6 @@ public class JEntry implements Cloneable {
 		}
 		this.children.add(child);
 		return this;
-	}
-
-	/**
-	 * @deprecated unintuitive to use
-	 * @see JEntry#child(JEntry)
-	 */
-	@Deprecated
-	public JEntry child(String child) {
-		return child(RuntimeResourcePackImpl.GSON.fromJson(child, JEntry.class));
 	}
 
 	public JEntry expand(Boolean expand) {

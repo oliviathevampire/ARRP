@@ -1,12 +1,10 @@
 package net.devtech.arrp.json.lang;
 
 import net.minecraft.block.Block;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -26,20 +24,6 @@ public class JLang implements Cloneable {
 
     public static JLang lang() {
         return new JLang();
-    }
-
-    /**
-     * Adds a custom entry to the lang file. (deprecated: renamed to a more intuitive name)
-     *
-     * @param in  the translation string
-     * @param out the in-game name of the object
-     * @return the file with the new entry.
-     * @deprecated use {@link #entry(String, String)} instead.
-     */
-    @Deprecated
-    public JLang translate(String in, String out) {
-        this.lang.put(in, out);
-        return this;
     }
 
     private <T> JLang object(Registry<T> registry, String str, T t, String name) {
@@ -68,16 +52,8 @@ public class JLang implements Cloneable {
     }
 
     public JLang item(ItemStack stack, String name) {
-        this.lang.put(stack.getTranslationKey(), name);
+        this.lang.put(stack.getItem().getTranslationKey(), name);
         return this;
-    }
-
-    /**
-     * @see JLang#itemRespect(Item, String) uses the {@link Item#getTranslationKey()}}
-     */
-    @Deprecated
-    public JLang item(Item item, String name) {
-        return this.object(Registries.ITEM, "item", item, name);
     }
 
     /**
@@ -86,14 +62,6 @@ public class JLang implements Cloneable {
     public JLang blockRespect(Block block, String name) {
         this.lang.put(block.getTranslationKey(), name);
         return this;
-    }
-
-    /**
-     * @see JLang#blockRespect(Block, String) uses the {@link Block#getTranslationKey()}}
-     */
-    @Deprecated
-    public JLang block(Block block, String name) {
-        return this.object(Registries.BLOCK, "block", block, name);
     }
 
     public JLang fluid(Fluid fluid, String name) {
@@ -106,30 +74,6 @@ public class JLang implements Cloneable {
     public JLang entityRespect(EntityType<?> type, String name) {
         this.lang.put(type.getTranslationKey(), name);
         return this;
-    }
-
-    /**
-     * @see JLang#entityRespect(EntityType, String) uses the {@link EntityType#getTranslationKey()}}
-     */
-    @Deprecated
-    public JLang entity(EntityType<?> type, String name) {
-        return this.object(Registries.ENTITY_TYPE, "entity_type", type, name);
-    }
-
-    /**
-     * adds a translation key for an entity, respects {@link Enchantment#getTranslationKey()}
-     */
-    public JLang enchantmentRespect(Enchantment enchantment, String name) {
-        this.lang.put(enchantment.getTranslationKey(), name);
-        return this;
-    }
-
-    /**
-     * @see JLang#enchantmentRespect(Enchantment, String) uses the {@link Enchantment#getTranslationKey()}}
-     */
-    @Deprecated
-    public JLang enchantment(Enchantment enchantment, String name) {
-        return this.object(Registries.ENCHANTMENT, "enchantment", enchantment, name);
     }
 
     public JLang item(Identifier item, String name) {

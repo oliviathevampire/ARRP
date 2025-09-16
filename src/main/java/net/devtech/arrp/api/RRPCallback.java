@@ -1,14 +1,12 @@
 package net.devtech.arrp.api;
 
-import java.util.List;
-import java.util.function.Function;
-
 import net.devtech.arrp.util.IrremovableList;
-
-import net.minecraft.resource.ResourcePack;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.resource.ResourcePack;
+
+import java.util.List;
+import java.util.function.Function;
 
 public interface RRPCallback {
 	Function<RRPCallback[], RRPCallback> CALLBACK_FUNCTION = r -> rs -> {
@@ -43,13 +41,6 @@ public interface RRPCallback {
 	 * Register your resource pack at a higher priority than minecraft and mod resources
 	 */
 	Event<RRPCallback> AFTER_VANILLA = EventFactory.createArrayBacked(RRPCallback.class, CALLBACK_FUNCTION);
-
-	/**
-	 * @deprecated unintuitive name
-	 * @see #BEFORE_VANILLA
-	 */
-	@Deprecated
-	Event<RRPCallback> EVENT = BEFORE_VANILLA;
 
 	/**
 	 * you can only add resource packs to this list, you may not remove them

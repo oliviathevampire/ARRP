@@ -1,23 +1,37 @@
 package net.devtech.arrp.json.loot;
 
-import java.lang.reflect.Type;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
 import net.devtech.arrp.impl.RuntimeResourcePackImpl;
 import net.devtech.arrp.json.models.JModel;
-
 import net.minecraft.util.Identifier;
 
+import java.lang.reflect.Type;
+
 public class JCondition implements Cloneable {
+	public static final Codec<JCondition> CODEC = new Codec<>() {
+		@Override public <T> DataResult<T> encode(JCondition v, DynamicOps<T> ops, T prefix) {
+			// write the parameters object as-is
+			return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, v.parameters).convert(ops).getValue());
+		}
+		@Override public <T> DataResult<Pair<JCondition, T>> decode(DynamicOps<T> ops, T input) {
+			JsonElement el = new Dynamic<>(ops, input).convert(JsonOps.INSTANCE).getValue();
+			if (!el.isJsonObject()) return DataResult.error(() -> "Loot condition must be an object");
+			JsonObject obj = el.getAsJsonObject();
+			var tag = obj.get("condition");
+			if (tag == null || !tag.isJsonPrimitive() || !tag.getAsJsonPrimitive().isString()) {
+				return DataResult.error(() -> "Loot condition missing 'condition' string");
+			}
+			JCondition c = new JCondition();
+			c.parameters = obj.deepCopy(); // store as-is
+			return DataResult.success(Pair.of(c, input));
+		}
+	};
+
 	private JsonObject parameters = new JsonObject();
 
 	/**
-	 * @see JLootTable#condition(String)
 	 * @see JLootTable#predicate(String)
 	 * @see JModel#condition()
 	 */

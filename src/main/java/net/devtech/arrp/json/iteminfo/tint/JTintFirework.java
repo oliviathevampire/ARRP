@@ -1,0 +1,34 @@
+package net.devtech.arrp.json.iteminfo.tint;
+
+import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.dynamic.Codecs;
+
+/** minecraft:firework — Average firework colors or default. Fields: default (RGB) */
+public final class JTintFirework extends JTint {
+    public static final String TYPE = "minecraft:firework";
+
+    private final int def;
+
+    public JTintFirework(int def) {
+        super(TYPE);
+        this.def = def;
+    }
+
+    public int defaultRgb() { return def; }
+
+    public static final Codec<JTintFirework> CODEC = RecordCodecBuilder.create(i -> i.group(
+        Codecs.RGB.fieldOf("default").forGetter(JTintFirework::defaultRgb)
+    ).apply(i, JTintFirework::new));
+
+    static { JTint.register(TYPE, CODEC); }
+
+    @Override public JTintFirework clone() { return new JTintFirework(def); }
+
+    @Override public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.addProperty("default", def);
+        return json;
+    }
+}

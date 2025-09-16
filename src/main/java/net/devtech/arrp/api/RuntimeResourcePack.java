@@ -1,10 +1,33 @@
 package net.devtech.arrp.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.mojang.datafixers.util.Either;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import net.devtech.arrp.JsonSerializers;
+import net.devtech.arrp.impl.RuntimeResourcePackImpl;
+import net.devtech.arrp.json.advancement.JAdvancement;
+import net.devtech.arrp.json.animation.JAnimation;
+import net.devtech.arrp.json.blockstate.JState;
+import net.devtech.arrp.json.equipmentinfo.JEquipmentModel;
+import net.devtech.arrp.json.iteminfo.JItemInfo;
+import net.devtech.arrp.json.lang.JLang;
+import net.devtech.arrp.json.loot.JLootTable;
+import net.devtech.arrp.json.models.JModel;
+import net.devtech.arrp.json.recipe.JRecipe;
+import net.devtech.arrp.json.tags.JTag;
+import net.devtech.arrp.util.CallableFunction;
+import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.StringIdentifiable;
+import org.jetbrains.annotations.Contract;
+import org.joml.Vector3f;
+
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
@@ -13,53 +36,52 @@ import java.util.function.IntUnaryOperator;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
-import net.devtech.arrp.impl.RuntimeResourcePackImpl;
-import net.devtech.arrp.json.animation.JAnimation;
-import net.devtech.arrp.json.blockstate.JState;
-import net.devtech.arrp.json.lang.JLang;
-import net.devtech.arrp.json.loot.JLootTable;
-import net.devtech.arrp.json.models.JModel;
-import net.devtech.arrp.json.recipe.JRecipe;
-import net.devtech.arrp.json.tags.JTag;
-import net.devtech.arrp.util.CallableFunction;
-import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-
 /**
- * a resource pack who's assets and data are evaluated at runtime
- *
+ * a resource pack whose assets and data are evaluated at runtime
+ * <p>
  * remember to register it!
  * @see RRPCallback
  */
 public interface RuntimeResourcePack extends ResourcePack {
+
+	/**
+	 * The GSONs used to serialize objects to JSON.
+	 */
+	Gson GSON = new GsonBuilder()
+			.registerTypeHierarchyAdapter(Identifier.class, JsonSerializers.IDENTIFIER)
+			.registerTypeHierarchyAdapter(StringIdentifiable.class, JsonSerializers.STRING_IDENTIFIABLE)
+			.registerTypeHierarchyAdapter(Vector3f.class, JsonSerializers.VECTOR_3F)
+			.registerTypeHierarchyAdapter(Either.class, JsonSerializers.EITHER)
+			.enableComplexMapKeySerialization()
+			.disableHtmlEscaping()
+			.setPrettyPrinting()
+			.create();
 	/**
 	 * create a new runtime resource pack with the default supported resource pack version
 	 */
+	@Contract("_ -> new")
 	static RuntimeResourcePack create(String id) {
-		return new RuntimeResourcePackImpl(new Identifier(id));
+		return new RuntimeResourcePackImpl(Identifier.tryParse(id));
 	}
 
+	@Contract("_, _ -> new")
 	static RuntimeResourcePack create(String id, int version) {
-		return new RuntimeResourcePackImpl(new Identifier(id), version);
+		return new RuntimeResourcePackImpl(Identifier.tryParse(id));
 	}
 
+	@Contract("_ -> new")
 	static RuntimeResourcePack create(Identifier id) {
 		return new RuntimeResourcePackImpl(id);
 	}
 
+	@Contract("_, _ -> new")
 	static RuntimeResourcePack create(Identifier id, int version) {
-		return new RuntimeResourcePackImpl(id, version);
+		return new RuntimeResourcePackImpl(id);
 	}
 
-	static Identifier id(String string) {return new Identifier(string);}
+	static Identifier id(String string) {return Identifier.tryParse(string);}
 
-	static Identifier id(String namespace, String string) {return new Identifier(namespace, string);}
+	static Identifier id(String namespace, String string) {return Identifier.tryParse(namespace, string);}
 
 
 	/**
@@ -131,7 +153,7 @@ public interface RuntimeResourcePack extends ResourcePack {
 	/**
 	 * add a raw resource to the root path
 	 *
-	 * A root resource is something like pack.png, pack.mcmeta, etc. By default ARRP generates a default mcmeta
+	 * A root resource is something like pack.png, pack.mcmeta, etc. By default, default mcmeta will be generated.
 	 */
 	byte[] addRootResource(String path, byte[] data);
 
@@ -150,7 +172,28 @@ public interface RuntimeResourcePack extends ResourcePack {
 	 * automatically
 	 * appended to the path
 	 */
+	byte[] addAdvancement(JAdvancement model, Identifier path);
+
+	/**
+	 * add a model, Items should go in item/... and Blocks in block/... ex. mymod:items/my_item ".json" is
+	 * automatically
+	 * appended to the path
+	 */
 	byte[] addModel(JModel model, Identifier path);
+
+	/**
+	 * add a item model info, Goes in items/. mymod:items/my_item ".json" is
+	 * automatically
+	 * appended to the path
+	 */
+	byte[] addItemModelInfo(JItemInfo model, Identifier path);
+
+
+	/**
+	 * Write a vanilla-style equipment‐model JSON to
+	 * assets/<namespace>/equipment/<path>.json
+	 */
+	byte[] addEquipmentModel(JEquipmentModel model, Identifier path);
 
 	/**
 	 * adds a blockstate json
@@ -202,7 +245,7 @@ public interface RuntimeResourcePack extends ResourcePack {
 	 */
 	Future<?> async(Consumer<RuntimeResourcePack> action);
 
-	File DEFAULT_OUTPUT = new File("rrp.debug");
+	Path DEFAULT_OUTPUT = Path.of("rrp.debug");
 
 	/**
 	 * forcefully dump all assets and data
@@ -214,14 +257,6 @@ public interface RuntimeResourcePack extends ResourcePack {
 	void dumpDirect(Path path);
 
 	void load(Path path) throws IOException;
-
-	/**
-	 * forcefully dump all assets and data to a specified file
-	 *
-	 * @deprecated use {@link #dump(Path)}
-	 */
-	@Deprecated
-	void dump(File file);
 
 	/**
 	 * forcefully dump all assets and data into `namespace;path/`, useful for debugging

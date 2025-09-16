@@ -1,5 +1,7 @@
 package net.devtech.arrp.json.blockstate;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Identifier;
 
 public class JBlockModel implements Cloneable {
@@ -9,14 +11,22 @@ public class JBlockModel implements Cloneable {
 	private Boolean uvlock;
 	private Integer weight;
 
-	@Deprecated
-	public JBlockModel(String model) {
-		this(new Identifier(model));
-	}
+	// ---- Codecs ----
+	public static final Codec<JBlockModel> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+			Identifier.CODEC.fieldOf("model").forGetter(m -> m.model),
+			Codec.INT.optionalFieldOf("x").forGetter(m -> java.util.Optional.ofNullable(m.x)),
+			Codec.INT.optionalFieldOf("y").forGetter(m -> java.util.Optional.ofNullable(m.y)),
+			Codec.BOOL.optionalFieldOf("uvlock").forGetter(m -> java.util.Optional.ofNullable(m.uvlock)),
+			Codec.INT.optionalFieldOf("weight").forGetter(m -> java.util.Optional.ofNullable(m.weight))
+	).apply(inst, (modelId, x, y, uv, w) -> {
+		JBlockModel m = new JBlockModel(modelId);
+		x.ifPresent(m::x);
+		y.ifPresent(m::y);
+		uv.ifPresent(u -> { if (u) m.uvlock(); });
+		w.ifPresent(m::weight);
+		return m;
+	}));
 
-	/**
-	 * @see JState#model(String)
-	 */
 	public JBlockModel(Identifier model) {
 		this.model = model;
 	}

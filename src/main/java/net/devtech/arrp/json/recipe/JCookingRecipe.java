@@ -1,17 +1,21 @@
 package net.devtech.arrp.json.recipe;
 
+import net.minecraft.util.Identifier;
+
 public abstract class JCookingRecipe extends JRecipe {
+
+
 	private final JIngredient ingredient;
-	private final String result;
+	private final JResult result;
 
 	private Float experience;
 	private Integer cookingtime;
 
-	JCookingRecipe(final String type, final JIngredient ingredient, final JResult result) {
+	JCookingRecipe(final Identifier type, final JIngredient ingredient, final JResult result) {
 		super(type);
 
 		this.ingredient = ingredient;
-		this.result = result.item;
+		this.result = result;
 	}
 
 	public JCookingRecipe experience(final float experience) {

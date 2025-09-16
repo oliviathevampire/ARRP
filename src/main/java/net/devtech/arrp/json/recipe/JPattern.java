@@ -1,16 +1,27 @@
 package net.devtech.arrp.json.recipe;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 public class JPattern implements Cloneable {
+	public static final Codec<JPattern> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Codec.STRING.listOf().fieldOf("rows").forGetter(JPattern::getRows)
+	).apply(instance, JPattern::new));
 	protected final String[] rows;
 
 	JPattern(String... rows) {
 		this.rows = rows;
+	}
+
+	JPattern(List<String> rows) {
+		this.rows = rows.toArray(new String[]{});
 	}
 
 	public static JPattern pattern() {
@@ -37,6 +48,10 @@ public class JPattern implements Cloneable {
 
 	public JPattern row3(String keys) {
 		return this.row(2, keys);
+	}
+
+	public List<String> getRows() {
+		return Arrays.stream(rows).toList();
 	}
 
 	@Override

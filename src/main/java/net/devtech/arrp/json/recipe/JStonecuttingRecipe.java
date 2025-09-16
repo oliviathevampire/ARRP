@@ -1,13 +1,14 @@
 package net.devtech.arrp.json.recipe;
 
+import net.minecraft.util.Identifier;
+
 public class JStonecuttingRecipe extends JRecipe {
 	private final JIngredient ingredient;
-	private final String result;
+	private final Identifier result;
 	private final int count;
 
 	JStonecuttingRecipe(final JIngredient ingredient, final JStackedResult result) {
-		super("stonecutting");
-
+		super(Identifier.ofVanilla("stonecutting"));
 		this.ingredient = ingredient;
 		this.result = result.item;
 		this.count = result.count;

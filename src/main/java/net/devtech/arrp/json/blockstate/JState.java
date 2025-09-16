@@ -1,17 +1,28 @@
 package net.devtech.arrp.json.blockstate;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.devtech.arrp.json.codec.Codecs;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public final class JState {
+	// ---- Codecs ----
+	// Accept either a single JVariant object or a list of them.
+	private static final Codec<List<JVariant>> VARIANTS = Codecs.oneOrList(JVariant.CODEC);
+	public static final Codec<JState> CODEC = RecordCodecBuilder.create(i -> i.group(
+			VARIANTS.optionalFieldOf("variants").forGetter(s -> s.variants.isEmpty() ? Optional.empty() : Optional.of(List.copyOf(s.variants))),
+			JMultipart.CODEC.listOf().optionalFieldOf("multipart").forGetter(s -> s.multiparts.isEmpty() ? Optional.empty() : Optional.of(List.copyOf(s.multiparts)))
+	).apply(i, (ov, om) -> {
+		if (ov.isPresent() && om.isPresent()) throw new IllegalStateException("variants XOR multipart");
+		JState s = new JState();
+		ov.ifPresent(l -> l.forEach(s::add));
+		om.ifPresent(l -> l.forEach(s::add));
+		return s;
+	}));
 	private final List<JVariant> variants = new ArrayList<>();
 	private final List<JMultipart> multiparts = new ArrayList<>();
 
@@ -35,28 +46,12 @@ public final class JState {
 		return state;
 	}
 
-	public JState add(JVariant variant) {
-		if (!this.multiparts.isEmpty()) {
-			throw new IllegalStateException("BlockStates can only have variants *or* multiparts, not both");
-		}
-		this.variants.add(variant);
-		return this;
-	}
-
 	public static JState state(JMultipart... parts) {
 		JState state = new JState();
 		for (JMultipart part : parts) {
 			state.add(part);
 		}
 		return state;
-	}
-
-	public JState add(JMultipart multiparts) {
-		if (!this.variants.isEmpty()) {
-			throw new IllegalStateException("BlockStates can only have variants *or* multiparts, not both");
-		}
-		this.multiparts.add(multiparts);
-		return this;
 	}
 
 	public static JVariant variant() {
@@ -67,10 +62,6 @@ public final class JState {
 		JVariant variant = new JVariant();
 		variant.put("", model);
 		return variant;
-	}
-
-	public static JBlockModel model(String id) {
-		return new JBlockModel(id);
 	}
 
 	public static JBlockModel model(Identifier id) {
@@ -88,9 +79,25 @@ public final class JState {
 	public static JWhen when() {
 		return new JWhen();
 	}
-	
+
 	public static JWhen.StateBuilder whenStateBuilder() {
 		return new JWhen.StateBuilder();
+	}
+
+	public JState add(JVariant variant) {
+		if (!this.multiparts.isEmpty()) {
+			throw new IllegalStateException("BlockStates can only have variants *or* multiparts, not both");
+		}
+		this.variants.add(variant);
+		return this;
+	}
+
+	public JState add(JMultipart multiparts) {
+		if (!this.variants.isEmpty()) {
+			throw new IllegalStateException("BlockStates can only have variants *or* multiparts, not both");
+		}
+		this.multiparts.add(multiparts);
+		return this;
 	}
 
 	@Override
@@ -99,24 +106,6 @@ public final class JState {
 			return (JState) super.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError(e);
-		}
-	}
-
-	public static class Serializer implements JsonSerializer<JState> {
-		@Override
-		public JsonElement serialize(JState src, Type typeOfSrc, JsonSerializationContext context) {
-			JsonObject json = new JsonObject();
-			if (!src.variants.isEmpty()) {
-				if (src.variants.size() == 1) {
-					json.add("variants", context.serialize(src.variants.get(0)));
-				} else {
-					json.add("variants", context.serialize(src.variants));
-				}
-			}
-			if (!src.multiparts.isEmpty()) {
-				json.add("multipart", context.serialize(src.multiparts));
-			}
-			return json;
 		}
 	}
 }

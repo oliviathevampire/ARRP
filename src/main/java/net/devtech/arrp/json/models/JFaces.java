@@ -43,6 +43,17 @@ public class JFaces implements Cloneable {
 		return this;
 	}
 
+	public static JFaces allSame(JFace face) {
+		JFaces faces = new JFaces();
+		faces.up(face);
+		faces.down(face);
+		faces.north(face);
+		faces.south(face);
+		faces.east(face);
+		faces.west(face);
+		return faces;
+	}
+
 	@Override
 	public JFaces clone() {
 		try {

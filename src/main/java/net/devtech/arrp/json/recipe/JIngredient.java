@@ -2,31 +2,101 @@ package net.devtech.arrp.json.recipe;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JIngredient implements Cloneable {
-	protected String item;
-	protected String tag;
-	protected List<JIngredient> ingredients;
+	public static final Codec<JIngredient> CODEC = new Codec<>() {
+		@Override
+		public <T> DataResult<T> encode(JIngredient v, DynamicOps<T> ops, T prefix) {
+			if (v.fabricCustom != null) {
+				// write the custom object verbatim
+				return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, v.fabricCustom).convert(ops).getValue());
+			}
+			if (v.item != null) {
+				return ops.mapBuilder()
+						.add(ops.createString("item"), Identifier.CODEC.encodeStart(ops, v.item).getOrThrow())
+						.build(prefix);
+			}
+			if (v.tag != null) {
+				return ops.mapBuilder()
+						.add(ops.createString("tag"), Identifier.CODEC.encodeStart(ops, v.tag).getOrThrow())
+						.build(prefix);
+			}
+			return DataResult.error(() -> "JIngredient: empty; set item(), tag(), or fabricCustom()");
+		}
 
-	JIngredient() {}
+		@Override
+		public <T> DataResult<Pair<JIngredient, T>> decode(DynamicOps<T> ops, T input) {
+			JsonElement el = new Dynamic<>(ops, input).convert(JsonOps.INSTANCE).getValue();
+			if (!el.isJsonObject()) return DataResult.error(() -> "Ingredient must be an object");
+			JsonObject obj = el.getAsJsonObject();
+
+			// Fabric custom branch
+			var ft = obj.get("fabric:type");
+			if (ft != null && ft.isJsonPrimitive() && ft.getAsJsonPrimitive().isString()) {
+				JIngredient ing = new JIngredient();
+				ing.fabricCustom = obj.deepCopy(); // store entire custom object
+				return DataResult.success(Pair.of(ing, input));
+			}
+
+			// Vanilla branches
+			var itemEl = obj.get("item");
+			var tagEl = obj.get("tag");
+			if (itemEl != null) {
+				var id = Identifier.CODEC.parse(JsonOps.INSTANCE, itemEl).result();
+				return id.<DataResult<Pair<JIngredient, T>>>map(identifier -> DataResult.success(Pair.of(JIngredient.ingredient().item(identifier), input))).orElseGet(() -> DataResult.error(() -> "Ingredient: bad 'item'"));
+			}
+			if (tagEl != null) {
+				var id = Identifier.CODEC.parse(JsonOps.INSTANCE, tagEl).result();
+				return id.map(identifier -> DataResult.success(Pair.of(JIngredient.ingredient().tag(identifier), input))).orElseGet(() -> DataResult.error(() -> "Ingredient: bad 'tag'"));
+			}
+			return DataResult.error(() -> "Ingredient: expected 'item', 'tag', or 'fabric:type'");
+		}
+	};
+	protected Identifier item;
+	protected Identifier tag;
+	protected List<JIngredient> ingredients;
+	private JsonObject fabricCustom;      // entire object for fabric custom ingredients
+
+	JIngredient() {
+	}
+
+	public JIngredient(Identifier item, Identifier tag, List<JIngredient> ingredients) {
+		this.item = item;
+		this.tag = tag;
+		this.ingredients = ingredients;
+	}
 
 	public static JIngredient ingredient() {
 		return new JIngredient();
 	}
 
-	public JIngredient item(Item item) {
-		return this.item(Registries.ITEM.getId(item).toString());
+	public boolean isFabricCustom() {
+		return fabricCustom != null;
 	}
 
-	public JIngredient item(String id) {
+	public JIngredient fabricCustom(Identifier type, java.util.function.Consumer<JsonObject> data) {
+		JsonObject obj = new JsonObject();
+		obj.addProperty("fabric:type", type.toString());
+		if (data != null) data.accept(obj);
+		this.fabricCustom = obj;
+		this.item = null;
+		this.tag = null;
+		return this;
+	}
+
+	public JIngredient item(Item item) {
+		return this.item(Registries.ITEM.getId(item));
+	}
+
+	public JIngredient item(Identifier id) {
 		if (this.isDefined()) {
 			return this.add(JIngredient.ingredient().item(id));
 		}
@@ -36,7 +106,7 @@ public class JIngredient implements Cloneable {
 		return this;
 	}
 
-	public JIngredient tag(String tag) {
+	public JIngredient tag(Identifier tag) {
 		if (this.isDefined()) {
 			return this.add(JIngredient.ingredient().tag(tag));
 		}
@@ -75,21 +145,15 @@ public class JIngredient implements Cloneable {
 		}
 	}
 
-	public static class Serializer implements JsonSerializer<JIngredient> {
-		@Override
-		public JsonElement serialize(final JIngredient src,
-				final Type typeOfSrc,
-				final JsonSerializationContext context) {
-			if (src.ingredients != null) {
-				return context.serialize(src.ingredients);
-			}
+	public Identifier getItem() {
+		return item;
+	}
 
-			final JsonObject object = new JsonObject();
+	public Identifier getTag() {
+		return tag;
+	}
 
-			object.add("item", context.serialize(src.item));
-			object.add("tag", context.serialize(src.tag));
-
-			return object;
-		}
+	public List<JIngredient> getIngredients() {
+		return ingredients;
 	}
 }

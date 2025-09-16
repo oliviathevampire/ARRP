@@ -1,8 +1,10 @@
 package net.devtech.arrp.json.recipe;
 
+import net.minecraft.util.Identifier;
+
 public class JCampfireRecipe extends JCookingRecipe {
 	JCampfireRecipe(final JIngredient ingredient, final JResult result) {
-		super("campfire_cooking", ingredient, result);
+		super(Identifier.ofVanilla("campfire_cooking"), ingredient, result);
 	}
 
 	@Override

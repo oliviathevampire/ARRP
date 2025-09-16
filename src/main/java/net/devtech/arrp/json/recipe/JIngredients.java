@@ -1,18 +1,29 @@
 package net.devtech.arrp.json.recipe;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.devtech.arrp.json.codec.Codecs;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
 public class JIngredients {
+	public static final Codec<JIngredients> CODEC = RecordCodecBuilder.create(i -> i.group(
+			Codecs.oneOrList(JIngredient.CODEC).fieldOf("ingredients").forGetter(JIngredients::getIngredients)
+	).apply(i, JIngredients::new));
+
 	protected final List<JIngredient> ingredients;
 
 	JIngredients() {
 		this.ingredients = new ArrayList<>();
+	}
+
+	public JIngredients(List<JIngredient> ingredients) {
+		this.ingredients = ingredients;
 	}
 
 	public static JIngredients ingredients() {
@@ -23,6 +34,15 @@ public class JIngredients {
 		this.ingredients.add(ingredient);
 
 		return this;
+	}
+
+	public JIngredients addAll(final List<JIngredient> ingredients) {
+		ingredients.forEach(this::add);
+		return this;
+	}
+
+	public List<JIngredient> getIngredients() {
+		return ingredients;
 	}
 
 	public static class Serializer implements JsonSerializer<JIngredients> {

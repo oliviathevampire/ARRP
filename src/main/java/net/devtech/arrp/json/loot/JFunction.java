@@ -1,6 +1,8 @@
 package net.devtech.arrp.json.loot;
 
 import com.google.gson.*;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
 import net.minecraft.util.Identifier;
 
 import java.lang.reflect.Type;
@@ -8,6 +10,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JFunction implements Cloneable {
+	public static final Codec<JFunction> CODEC = new Codec<>() {
+		@Override public <T> DataResult<T> encode(JFunction v, DynamicOps<T> ops, T prefix) {
+			var builder = ops.mapBuilder();
+
+			// dump properties object
+			T props = new Dynamic<>(JsonOps.INSTANCE, v.properties).convert(ops).getValue();
+			var mapRes = ops.getMap(props);
+			if (mapRes.result().isEmpty()) return DataResult.error(() -> "function properties not an object");
+			for (Pair<T, T> e : mapRes.result().get().entries().toList()) {
+				builder.add(e.getFirst(), e.getSecond());
+			}
+
+			if (!v.conditions.isEmpty()) {
+				var conds = JCondition.CODEC.listOf().encodeStart(ops, v.conditions);
+				if (conds.result().isEmpty()) return conds;
+				builder.add(ops.createString("conditions"), conds.result().get());
+			}
+			return builder.build(prefix);
+		}
+
+		@Override public <T> DataResult<Pair<JFunction, T>> decode(DynamicOps<T> ops, T input) {
+			// convert full object to JSON, then peel off "conditions"
+			var el = new Dynamic<>(ops, input).convert(JsonOps.INSTANCE).getValue();
+			if (!el.isJsonObject()) return DataResult.error(() -> "loot function must be an object");
+			JsonObject obj = el.getAsJsonObject();
+
+			var fnEl = obj.get("function");
+			if (fnEl == null || !fnEl.isJsonPrimitive()) return DataResult.error(() -> "missing 'function'");
+			String fn = fnEl.getAsString();
+
+			// extract conditions if present
+			List<JCondition> conds = java.util.List.of();
+			var condEl = obj.remove("conditions");
+			if (condEl != null) {
+				var parsed = JCondition.CODEC.listOf().parse(JsonOps.INSTANCE, condEl);
+				if (parsed.result().isEmpty()) return DataResult.error(() -> "bad function.conditions");
+				conds = parsed.result().get();
+			}
+
+			JFunction f = new JFunction(fn);
+			f.properties = obj;               // store remaining properties intact
+			f.conditions.addAll(conds);       // fill list
+			return DataResult.success(Pair.of(f, input));
+		}
+	};
 	private final List<JCondition> conditions = new ArrayList<>();
 	private JsonObject properties = new JsonObject();
 
@@ -57,15 +104,6 @@ public class JFunction implements Cloneable {
 	public JFunction condition(JCondition condition) {
 		this.conditions.add(condition);
 		return this;
-	}
-
-	/**
-	 * @deprecated unintuitive name
-	 * @see JFunction#condition(JCondition)
-	 */
-	@Deprecated
-	public JFunction add(JCondition condition) {
-		return condition(condition);
 	}
 
 	@Override

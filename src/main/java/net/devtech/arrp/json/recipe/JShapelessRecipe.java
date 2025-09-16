@@ -1,10 +1,12 @@
 package net.devtech.arrp.json.recipe;
 
+import net.minecraft.util.Identifier;
+
 public class JShapelessRecipe extends JResultRecipe {
 	protected final JIngredients ingredients;
 
 	JShapelessRecipe(final JResult result, final JIngredients ingredients) {
-		super("minecraft:crafting_shapeless", result);
+		super(Identifier.ofVanilla("crafting_shapeless"), result);
 
 		this.ingredients = ingredients;
 	}
