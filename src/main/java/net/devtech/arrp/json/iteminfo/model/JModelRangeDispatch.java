@@ -104,7 +104,7 @@ public class JModelRangeDispatch extends JItemModel {
     );
 
     static {
-        JItemModel.register(TYPE, CODEC.xmap(m -> {
+        JItemModel.register(TYPE, MapCodec.assumeMapUnsafe(CODEC).xmap(m -> {
             m.type = TYPE;
             return m;
         }, m -> m));

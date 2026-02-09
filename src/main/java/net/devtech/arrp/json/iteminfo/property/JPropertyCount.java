@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -39,7 +40,7 @@ public class JPropertyCount extends JProperty {
         return normalize;
     }
 
-    public static final Codec<JPropertyCount> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JPropertyCount> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.BOOL.fieldOf("normalize").forGetter(JPropertyCount::isNormalize)
     ).apply(i, JPropertyCount::new));
 

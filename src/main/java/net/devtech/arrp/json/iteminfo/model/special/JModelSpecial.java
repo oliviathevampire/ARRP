@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.model.special;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.iteminfo.model.JItemModel;
 
@@ -10,7 +11,7 @@ import net.devtech.arrp.json.iteminfo.model.JItemModel;
  */
 public class JModelSpecial extends JItemModel {
     public static final String TYPE = "minecraft:special";
-    public static final Codec<JModelSpecial> CODEC = RecordCodecBuilder.create(function -> function.group(
+    public static final MapCodec<JModelSpecial> CODEC = RecordCodecBuilder.mapCodec(function -> function.group(
             Codec.STRING.fieldOf("base").forGetter(JModelSpecial::getBase),
             JItemModel.CODEC.fieldOf("model").forGetter(JModelSpecial::getModel),
             Codec.STRING.fieldOf("special_type").forGetter(JModelSpecial::getSpecialType)

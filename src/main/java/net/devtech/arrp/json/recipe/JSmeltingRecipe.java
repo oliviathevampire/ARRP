@@ -1,10 +1,10 @@
 package net.devtech.arrp.json.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class JSmeltingRecipe extends JCookingRecipe {
 	JSmeltingRecipe(final JIngredient ingredient, final JResult result) {
-		super(Identifier.ofVanilla("smelting"), ingredient, result);
+		super(Identifier.withDefaultNamespace("smelting"), ingredient, result);
 	}
 
 	@Override

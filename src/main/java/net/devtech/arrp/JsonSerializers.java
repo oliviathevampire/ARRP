@@ -7,10 +7,10 @@ import com.google.gson.JsonSerializer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.util.StringRepresentable;
 import org.joml.Vector3f;
 
 public final class JsonSerializers {
@@ -22,7 +22,7 @@ public final class JsonSerializers {
 		array.add(src.z);
 		return array;
 	};
-	public static final JsonSerializer<StringIdentifiable> STRING_IDENTIFIABLE = (src, type, context) -> new JsonPrimitive(src.asString());
+	public static final JsonSerializer<StringRepresentable> STRING_IDENTIFIABLE = (src, type, context) -> new JsonPrimitive(src.getSerializedName());
 	public static final JsonSerializer<Identifier> IDENTIFIER = (src, type, context) -> new JsonPrimitive(src.toString());
 
 	private JsonSerializers() {
@@ -32,8 +32,8 @@ public final class JsonSerializers {
 		return (src, typeOfSrc, context) -> codec.encodeStart(JsonOps.INSTANCE, src).getOrThrow();
 	}
 
-	public static <T> JsonSerializer<T> forCodec(Codec<T> codec, RegistryWrapper.WrapperLookup registryLookup) {
-		final RegistryOps<JsonElement> ops = registryLookup.getOps(JsonOps.INSTANCE);
+	public static <T> JsonSerializer<T> forCodec(Codec<T> codec, HolderLookup.Provider registryLookup) {
+		final RegistryOps<JsonElement> ops = registryLookup.createSerializationContext(JsonOps.INSTANCE);
 		return (src, typeOfSrc, context) -> codec.encodeStart(ops, src).getOrThrow();
 	}
 }

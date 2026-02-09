@@ -4,12 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public class JIngredient implements Cloneable {
 	public static final Codec<JIngredient> CODEC = new Codec<>() {
@@ -93,7 +92,7 @@ public class JIngredient implements Cloneable {
 	}
 
 	public JIngredient item(Item item) {
-		return this.item(Registries.ITEM.getId(item));
+		return this.item(BuiltInRegistries.ITEM.getKey(item));
 	}
 
 	public JIngredient item(Identifier id) {

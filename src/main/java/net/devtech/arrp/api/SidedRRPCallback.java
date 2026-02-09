@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.devtech.arrp.util.IrremovableList;
-
-import net.minecraft.resource.LifecycledResourceManagerImpl;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.util.Util;
 
 import net.fabricmc.fabric.api.event.Event;
@@ -15,7 +14,7 @@ import net.fabricmc.fabric.api.event.EventFactory;
 
 public interface SidedRRPCallback {
 	Function<SidedRRPCallback[], SidedRRPCallback> CALLBACK_FUNCTION = r -> (type, rs) -> {
-		IrremovableList<ResourcePack> packs = new IrremovableList<>(rs, $ -> {
+		IrremovableList<PackResources> packs = new IrremovableList<>(rs, $ -> {
 		});
 		for (SidedRRPCallback callback : r) {
 			callback.insert(type, packs);
@@ -54,9 +53,9 @@ public interface SidedRRPCallback {
 	Event<SidedRRPCallback> AFTER_VANILLA = EventFactory.createArrayBacked(SidedRRPCallback.class, CALLBACK_FUNCTION);
 
 	/**
-	 * @see LifecycledResourceManagerImpl#LifecycledResourceManagerImpl(ResourceType, List)
+	 * @see MultiPackResourceManager#MultiPackResourceManager(PackType, List)
 	 */
-	void insert(ResourceType type, List<ResourcePack> resources);
+	void insert(PackType type, List<PackResources> resources);
 
 	static Void INIT_ = Util.make(() -> {
 		BEFORE_VANILLA.register((type, resources) -> RRPCallback.BEFORE_VANILLA.invoker().insert(resources));

@@ -2,13 +2,13 @@ package net.devtech.arrp.json.iteminfo.tint;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.ExtraCodecs;
 
 /** minecraft:map_color — Map color or default. Fields: default (RGB) */
 public final class JTintMapColor extends JTint {
 	public static final String TYPE = "minecraft:map_color";
 	public static final Codec<JTintMapColor> CODEC = RecordCodecBuilder.create(i -> i.group(
-			Codecs.RGB.fieldOf("default").forGetter(JTintMapColor::defaultRgb)
+			ExtraCodecs.RGB_COLOR_CODEC.fieldOf("default").forGetter(JTintMapColor::defaultRgb)
 	).apply(i, JTintMapColor::new));
 
 	static {

@@ -1,9 +1,8 @@
 package net.devtech.arrp.json;
 
 import com.google.gson.*;
-import net.minecraft.util.Identifier;
-
 import java.lang.reflect.Type;
+import net.minecraft.resources.Identifier;
 
 /**
  * Serializes a ResourceLocation as one JSON string ("namespace:path"),

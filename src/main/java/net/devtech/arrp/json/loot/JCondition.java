@@ -5,8 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import net.devtech.arrp.impl.RuntimeResourcePackImpl;
 import net.devtech.arrp.json.models.JModel;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
 import java.lang.reflect.Type;
 
 public class JCondition implements Cloneable {

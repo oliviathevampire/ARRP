@@ -1,13 +1,14 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
  * Represents the "minecraft:time" numeric property.
  */
 public class JPropertyTime extends JProperty {
-	public static final Codec<JPropertyTime> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JPropertyTime> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Codec.STRING.optionalFieldOf("source", "daytime").forGetter(JPropertyTime::getSource),
 			Codec.BOOL.optionalFieldOf("wobble", true).forGetter(JPropertyTime::isWobble)
 	).apply(i, (src, wob) -> {

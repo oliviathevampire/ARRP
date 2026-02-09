@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -8,7 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  */
 public class JPropertyKeybindDown extends JProperty {
 	public static final String TYPE = "minecraft:keybind_down";
-	public static final Codec<JPropertyKeybindDown> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+	public static final MapCodec<JPropertyKeybindDown> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 			Codec.STRING.fieldOf("keybind").forGetter(JPropertyKeybindDown::getKeybind)
 	).apply(instance, JPropertyKeybindDown::new));
 

@@ -2,9 +2,8 @@ package net.devtech.arrp.json.blockstate;
 
 import com.mojang.serialization.Codec;
 import net.devtech.arrp.json.codec.Codecs;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,8 +70,8 @@ public final class JVariant implements Cloneable {
 	 *
 	 * @see Direction
 	 */
-	public JVariant put(String property, StringIdentifiable value, JBlockModel model) {
-		return this.put(property + '=' + value.asString(), model);
+	public JVariant put(String property, StringRepresentable value, JBlockModel model) {
+		return this.put(property + '=' + value.getSerializedName(), model);
 	}
 
 	/**

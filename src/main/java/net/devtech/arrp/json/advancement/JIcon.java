@@ -2,18 +2,17 @@ package net.devtech.arrp.json.advancement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.Optional;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public final class JIcon {
 	public static final Codec<JIcon> CODEC = RecordCodecBuilder.create(i -> i.group(
 			Identifier.CODEC.fieldOf("item").forGetter(ic -> ic.item),
 			Codec.INT.optionalFieldOf("count").forGetter(ic -> Optional.ofNullable(ic.count)),
-			ComponentChanges.CODEC.optionalFieldOf("components").forGetter(ic -> Optional.ofNullable(ic.components))
+			DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(ic -> Optional.ofNullable(ic.components))
 	).apply(i, (item, count, comps) -> {
 		JIcon ic = new JIcon();
 		ic.item = item;
@@ -24,7 +23,7 @@ public final class JIcon {
 
 	public Identifier item;
 	public Integer count;                 // optional
-	public ComponentChanges components; // optional (1.20.5+)
+	public DataComponentPatch components; // optional (1.20.5+)
 
 	// builder sugar
 	public static JIcon of(Identifier itemId) {
@@ -35,7 +34,7 @@ public final class JIcon {
 
 	public static JIcon of(Item item) {
 		JIcon ic = new JIcon();
-		ic.item = Registries.ITEM.getId(item);
+		ic.item = BuiltInRegistries.ITEM.getKey(item);
 		return ic;
 	}
 
@@ -44,7 +43,7 @@ public final class JIcon {
 		return this;
 	}
 
-	public JIcon components(ComponentChanges p) {
+	public JIcon components(DataComponentPatch p) {
 		this.components = p;
 		return this;
 	}

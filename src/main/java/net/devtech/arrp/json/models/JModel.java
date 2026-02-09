@@ -1,9 +1,8 @@
 package net.devtech.arrp.json.models;
 
 import net.devtech.arrp.json.loot.JCondition;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

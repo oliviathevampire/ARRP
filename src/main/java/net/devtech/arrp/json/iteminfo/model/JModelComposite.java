@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.model;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.iteminfo.tint.JTint;
 
@@ -24,7 +24,7 @@ public final class JModelComposite extends JItemModel {
 	// getter for codec
 	public List<JItemModel> getParts() { return parts; }
 
-	public static final Codec<JModelComposite> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JModelComposite> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			// base fields first
 			JTint.CODEC.listOf().optionalFieldOf("tints").forGetter(JModelComposite::codecGetTints),
 			LAZY_SELF.optionalFieldOf("fallback").forGetter(JModelComposite::codecGetFallback),

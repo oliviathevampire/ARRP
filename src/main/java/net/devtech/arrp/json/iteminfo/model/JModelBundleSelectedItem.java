@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.model;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:bundle_selected_item" special model type.
@@ -10,7 +11,7 @@ public class JModelBundleSelectedItem extends JItemModel {
 	public static final String TYPE = "bundle_selected_item";
 
 	// no extra args, so it's just a unit codec
-	public static final Codec<JModelBundleSelectedItem> CODEC = Codec.unit(() -> {
+	public static final MapCodec<JModelBundleSelectedItem> CODEC = MapCodec.unit(() -> {
 		JModelBundleSelectedItem m = new JModelBundleSelectedItem();
 		m.type = TYPE;
 		return m;

@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "carried" string property.
@@ -16,7 +16,7 @@ public class JPropertyCarried extends JProperty {
         return new JPropertyCarried();
     }
 
-    public static final Codec<JPropertyCarried> CODEC = Codec.unit(JPropertyCarried::new);
+    public static final MapCodec<JPropertyCarried> CODEC = MapCodec.unit(JPropertyCarried::new);
 
     static {
         JProperty.register(TYPE, CODEC);

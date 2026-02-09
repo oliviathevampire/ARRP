@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -25,7 +26,7 @@ public class JPropertyCustomModelData extends JProperty {
         return index;
     }
 
-    public static final Codec<JPropertyCustomModelData> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JPropertyCustomModelData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.INT.fieldOf("index").forGetter(JPropertyCustomModelData::getIndex)
     ).apply(i, JPropertyCustomModelData::of));
 

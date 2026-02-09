@@ -1,13 +1,13 @@
 package net.devtech.arrp.json.iteminfo.model;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.iteminfo.tint.JTint;
 
 public final class JModelEmpty extends JItemModel {
 	public static final String TYPE = "minecraft:empty";
 
-	public static final Codec<JModelEmpty> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JModelEmpty> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			// base fields first
 			JTint.CODEC.listOf().optionalFieldOf("tints").forGetter(JModelEmpty::codecGetTints),
 			LAZY_SELF.optionalFieldOf("fallback").forGetter(JModelEmpty::codecGetFallback)

@@ -17,11 +17,20 @@ import net.devtech.arrp.json.loot.JLootTable;
 import net.devtech.arrp.json.models.JModel;
 import net.devtech.arrp.json.recipe.JRecipe;
 import net.devtech.arrp.json.tags.JTag;
+import net.devtech.arrp.json.timeline.JTimeline;
+import net.devtech.arrp.json.worldgen.biome.JBiome;
+import net.devtech.arrp.json.worldgen.dimension.JDimension;
+import net.devtech.arrp.json.worldgen.dimension.JDimensionType;
+import net.devtech.arrp.json.worldgen.feature.JConfiguredFeature;
+import net.devtech.arrp.json.worldgen.feature.JPlacedFeature;
+import net.devtech.arrp.json.worldgen.noise.JNoiseSettings;
+import net.devtech.arrp.json.worldgen.structure.JStructure;
+import net.devtech.arrp.json.worldgen.structure.JStructureSet;
 import net.devtech.arrp.util.CallableFunction;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.Contract;
 import org.joml.Vector3f;
 
@@ -42,14 +51,14 @@ import java.util.zip.ZipOutputStream;
  * remember to register it!
  * @see RRPCallback
  */
-public interface RuntimeResourcePack extends ResourcePack {
+public interface RuntimeResourcePack extends PackResources {
 
 	/**
 	 * The GSONs used to serialize objects to JSON.
 	 */
 	Gson GSON = new GsonBuilder()
 			.registerTypeHierarchyAdapter(Identifier.class, JsonSerializers.IDENTIFIER)
-			.registerTypeHierarchyAdapter(StringIdentifiable.class, JsonSerializers.STRING_IDENTIFIABLE)
+			.registerTypeHierarchyAdapter(StringRepresentable.class, JsonSerializers.STRING_IDENTIFIABLE)
 			.registerTypeHierarchyAdapter(Vector3f.class, JsonSerializers.VECTOR_3F)
 			.registerTypeHierarchyAdapter(Either.class, JsonSerializers.EITHER)
 			.enableComplexMapKeySerialization()
@@ -81,7 +90,7 @@ public interface RuntimeResourcePack extends ResourcePack {
 
 	static Identifier id(String string) {return Identifier.tryParse(string);}
 
-	static Identifier id(String namespace, String string) {return Identifier.tryParse(namespace, string);}
+	static Identifier id(String namespace, String string) {return Identifier.tryBuild(namespace, string);}
 
 
 	/**
@@ -120,19 +129,19 @@ public interface RuntimeResourcePack extends ResourcePack {
 	 *
 	 * @see #async(Consumer)
 	 */
-	Future<byte[]> addAsyncResource(ResourceType type,
+	Future<byte[]> addAsyncResource(PackType type,
 			Identifier identifier,
 			CallableFunction<Identifier, byte[]> data);
 
 	/**
 	 * add a resource that is lazily evaluated
 	 */
-	void addLazyResource(ResourceType type, Identifier path, BiFunction<RuntimeResourcePack, Identifier, byte[]> data);
+	void addLazyResource(PackType type, Identifier path, BiFunction<RuntimeResourcePack, Identifier, byte[]> data);
 
 	/**
 	 * add a raw resource
 	 */
-	byte[] addResource(ResourceType type, Identifier path, byte[] data);
+	byte[] addResource(PackType type, Identifier path, byte[] data);
 
 	/**
 	 * adds an async root resource, this is evaluated off-thread, this does not hold all resource retrieval unlike
@@ -234,6 +243,24 @@ public interface RuntimeResourcePack extends ResourcePack {
 	 */
 	byte[] addRecipe(Identifier id, JRecipe recipe);
 
+	byte[] addTimeline(Identifier id, JTimeline timeline);
+
+	byte[] addBiome(Identifier id, JBiome biome);
+
+	byte[] addDimension(Identifier id, JDimension dimension);
+
+	byte[] addDimensionType(Identifier id, JDimensionType dimensionType);
+
+	byte[] addConfiguredFeature(Identifier id, JConfiguredFeature configuredFeature);
+
+	byte[] addPlacedFeature(Identifier id, JPlacedFeature placedFeature);
+
+	byte[] addNoiseSettings(Identifier id, JNoiseSettings noiseSettings);
+
+	byte[] addStructure(Identifier id, JStructure structure);
+
+	byte[] addStructureSet(Identifier id, JStructureSet structureSet);
+
 	/**
 	 * invokes the action on the RRP executor, RRPs are thread-safe you can create expensive assets here, all resources
 	 * are blocked until all async tasks are completed invokes the action on the RRP executor, RRPs are thread-safe you
@@ -241,7 +268,7 @@ public interface RuntimeResourcePack extends ResourcePack {
 	 * <p>
 	 * calling an this function from itself will result in a infinite loop
 	 *
-	 * @see #addAsyncResource(ResourceType, Identifier, CallableFunction)
+	 * @see #addAsyncResource(PackType, Identifier, CallableFunction)
 	 */
 	Future<?> async(Consumer<RuntimeResourcePack> action);
 
@@ -262,7 +289,7 @@ public interface RuntimeResourcePack extends ResourcePack {
 	 * forcefully dump all assets and data into `namespace;path/`, useful for debugging
 	 */
 	default void dump(Path path) {
-		String id = this.getInfo().id();
+		String id = this.location().id();
 		Path folder = path.resolve(id);
 		this.dumpDirect(folder);
 	}

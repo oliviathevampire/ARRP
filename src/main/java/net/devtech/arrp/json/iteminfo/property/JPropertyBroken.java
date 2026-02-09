@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:broken" boolean property.
@@ -16,7 +16,7 @@ public class JPropertyBroken extends JProperty {
         return new JPropertyBroken();
     }
 
-    public static final Codec<JPropertyBroken> CODEC = Codec.unit(JPropertyBroken::new);
+    public static final MapCodec<JPropertyBroken> CODEC = MapCodec.unit(JPropertyBroken::new);
 
     static {
         JProperty.register(TYPE, CODEC);

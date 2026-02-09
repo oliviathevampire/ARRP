@@ -2,12 +2,18 @@ package net.devtech.arrp.mixin;
 
 import net.devtech.arrp.ARRP;
 import net.devtech.arrp.api.RRPCallback;
-import net.minecraft.resource.*;
-import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
-import net.minecraft.resource.ResourcePackProfile.Metadata;
-import net.minecraft.resource.ResourcePackProfile.PackFactory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.*;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.FolderRepositorySource;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.Pack.Metadata;
+import net.minecraft.server.packs.repository.Pack.Position;
+import net.minecraft.server.packs.repository.Pack.ResourcesSupplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -22,42 +28,42 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-@Mixin(FileResourcePackProvider.class)
+@Mixin(FolderRepositorySource.class)
 public class FileResourcePackProviderMixin {
-	@Shadow @Final private ResourceType type;
+	@Shadow @Final private PackType packType;
 	private static final Logger ARRP_LOGGER = LogManager.getLogger("ARRP/FileResourcePackProviderMixin");
 
-	private static UnaryOperator<Text> getSourceTextSupplier() {
-		Text text = Text.translatable("pack.source.runtime");
-		return name -> Text.translatable("pack.nameAndSource", name, text).formatted(Formatting.GRAY);
+	private static UnaryOperator<Component> getSourceTextSupplier() {
+		Component text = Component.translatable("pack.source.runtime");
+		return name -> Component.translatable("pack.nameAndSource", name, text).withStyle(ChatFormatting.GRAY);
 	}
 
-	@Inject(method = "register", at = @At("HEAD"))
+	@Inject(method = "loadPacks", at = @At("HEAD"))
 	public void register(
-		Consumer<ResourcePackProfile> adder,
+		Consumer<Pack> adder,
 		CallbackInfo ci
 	) throws ExecutionException, InterruptedException {
-		List<ResourcePack> list = new ArrayList<>();
+		List<PackResources> list = new ArrayList<>();
 		ARRP.waitForPregen();
 		ARRP_LOGGER.info("ARRP register - before user");
 		RRPCallback.BEFORE_USER.invoker().insert(list);
 
-		for (ResourcePack pack : list) {
-			adder.accept(ResourcePackProfile.create(
-					pack.getInfo(),
-					new PackFactory() {
+		for (PackResources pack : list) {
+			adder.accept(Pack.readMetaAndCreate(
+					pack.location(),
+					new ResourcesSupplier() {
 						@Override
-						public ResourcePack openWithOverlays(ResourcePackInfo var1, Metadata var2) {
+						public PackResources openFull(PackLocationInfo var1, Metadata var2) {
 							return pack;
 						}
 
 						@Override
-						public ResourcePack open(ResourcePackInfo var1) {
+						public PackResources openPrimary(PackLocationInfo var1) {
 							return pack;
 						}
 					},
-					this.type,
-					new ResourcePackPosition(true, InsertionPosition.TOP, false)
+					this.packType,
+					new PackSelectionConfig(true, Position.TOP, false)
 			));
 		}
 	}

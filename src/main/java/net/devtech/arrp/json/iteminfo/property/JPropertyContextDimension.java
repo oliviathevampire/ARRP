@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:context_dimension" property.
@@ -11,7 +11,7 @@ public class JPropertyContextDimension extends JProperty {
         super(TYPE);
     }
 
-    public static final Codec<JPropertyContextDimension> CODEC = Codec.unit(JPropertyContextDimension::new);
+    public static final MapCodec<JPropertyContextDimension> CODEC = MapCodec.unit(JPropertyContextDimension::new);
 
     static {
         JProperty.register(TYPE, CODEC);

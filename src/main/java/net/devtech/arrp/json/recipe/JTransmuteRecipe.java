@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class JTransmuteRecipe extends JResultRecipe {
 	private String category;
@@ -8,7 +8,7 @@ public class JTransmuteRecipe extends JResultRecipe {
 	private JIngredient material;
 
 	JTransmuteRecipe(JResult result, String category, JIngredient input, JIngredient material) {
-		super(Identifier.ofVanilla("crafting_transmute"), result);
+		super(Identifier.withDefaultNamespace("crafting_transmute"), result);
 
 		this.category = category;
 		this.input = input;

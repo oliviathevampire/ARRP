@@ -1,13 +1,13 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "crossbow/pull" numeric property.
  */
 public class JPropertyCrossbowPull extends JProperty {
 	public static final String TYPE = "minecraft:crossbow/pull";
-	public static final Codec<JPropertyCrossbowPull> CODEC = Codec.unit(JPropertyCrossbowPull::new);
+	public static final MapCodec<JPropertyCrossbowPull> CODEC = MapCodec.unit(JPropertyCrossbowPull::new);
 
 	static {
 		JProperty.register(TYPE, CODEC);

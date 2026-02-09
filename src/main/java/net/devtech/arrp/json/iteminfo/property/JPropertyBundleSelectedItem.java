@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "bundle/selected_item" string property.
@@ -16,7 +16,7 @@ public class JPropertyBundleSelectedItem extends JProperty {
         return new JPropertyBundleSelectedItem();
     }
 
-    public static final Codec<JPropertyBundleSelectedItem> CODEC = Codec.unit(JPropertyBundleSelectedItem::new);
+    public static final MapCodec<JPropertyBundleSelectedItem> CODEC = MapCodec.unit(JPropertyBundleSelectedItem::new);
 
     static {
         JProperty.register(TYPE, CODEC);

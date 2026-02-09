@@ -2,14 +2,14 @@ package net.devtech.arrp.json.iteminfo.tint;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.ExtraCodecs;
 
 /** minecraft:grass — Colormap(temperature,downfall). Fields: temperature (0..1), downfall (0..1) */
 public final class JTintGrass extends JTint {
 	public static final String TYPE = "minecraft:grass";
 	public static final Codec<JTintGrass> CODEC = RecordCodecBuilder.create(i -> i.group(
-			Codecs.rangedInclusiveFloat(0.0F, 1.0F).fieldOf("temperature").forGetter(JTintGrass::temperature),
-			Codecs.rangedInclusiveFloat(0.0F, 1.0F).fieldOf("downfall").forGetter(JTintGrass::downfall)
+			ExtraCodecs.floatRange(0.0F, 1.0F).fieldOf("temperature").forGetter(JTintGrass::temperature),
+			ExtraCodecs.floatRange(0.0F, 1.0F).fieldOf("downfall").forGetter(JTintGrass::downfall)
 	).apply(i, JTintGrass::new));
 
 	static {

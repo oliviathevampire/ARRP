@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.property;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -41,7 +42,7 @@ public class JPropertyComponent extends JProperty {
         return json;
     }
 
-    public static final Codec<JPropertyComponent> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JPropertyComponent> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.STRING.fieldOf("component").forGetter(JPropertyComponent::getComponent)
     ).apply(i, JPropertyComponent::new));
 

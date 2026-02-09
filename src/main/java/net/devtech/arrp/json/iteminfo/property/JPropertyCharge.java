@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:charge" numeric property.
@@ -16,7 +16,7 @@ public class JPropertyCharge extends JProperty {
         return new JPropertyCharge();
     }
 
-    public static final Codec<JPropertyCharge> CODEC = Codec.unit(JPropertyCharge::new);
+    public static final MapCodec<JPropertyCharge> CODEC = MapCodec.unit(JPropertyCharge::new);
 
     static {
         JProperty.register(TYPE, CODEC);

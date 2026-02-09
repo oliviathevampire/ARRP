@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:context_entity_type" property.
@@ -11,7 +11,7 @@ public class JPropertyContextEntityType extends JProperty {
         super("minecraft:context_entity_type");
     }
 
-    public static final Codec<JPropertyContextEntityType> CODEC = Codec.unit(JPropertyContextEntityType::new);
+    public static final MapCodec<JPropertyContextEntityType> CODEC = MapCodec.unit(JPropertyContextEntityType::new);
 
     static {
         JProperty.register(TYPE, CODEC);

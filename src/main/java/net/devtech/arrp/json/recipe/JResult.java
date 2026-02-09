@@ -3,12 +3,11 @@ package net.devtech.arrp.json.recipe;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.Optional;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public class JResult {
 	public static final Codec<JResult> OBJECT_CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -18,7 +17,7 @@ public class JResult {
 					(r instanceof JStackedResult s) ? Optional.ofNullable(s.getCount()) : Optional.empty()
 			),
 			// ✅ components OPTIONAL — don't encode when null
-			ComponentChanges.CODEC.optionalFieldOf("components").forGetter(r -> Optional.ofNullable(r.components))
+			DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(r -> Optional.ofNullable(r.components))
 	).apply(i, (id, oc, comps) -> {
 		JResult res = oc.isPresent() ? JResult.stackedResult(id, oc.get()) : JResult.result(id);
 		comps.ifPresent(res::components);
@@ -37,19 +36,19 @@ public class JResult {
 	);
 
 	protected final Identifier item;
-	protected ComponentChanges components; // NEW
+	protected DataComponentPatch components; // NEW
 
 	JResult(final Identifier id) {
 		this.item = id;
 	}
 
-	public JResult(Identifier item, ComponentChanges components) {
+	public JResult(Identifier item, DataComponentPatch components) {
 		this.item = item;
 		this.components = components;
 	}
 
 	public static JResult item(final Item item) {
-		return result(Registries.ITEM.getId(item));
+		return result(BuiltInRegistries.ITEM.getKey(item));
 	}
 
 	public static JResult result(final Identifier id) {
@@ -57,7 +56,7 @@ public class JResult {
 	}
 
 	public static JStackedResult itemStack(final Item item, final int count) {
-		return stackedResult(Registries.ITEM.getId(item), count);
+		return stackedResult(BuiltInRegistries.ITEM.getKey(item), count);
 	}
 
 	public static JStackedResult stackedResult(final Identifier id, final int count) {
@@ -69,14 +68,14 @@ public class JResult {
 	}
 
 	/** Set full component changes. */
-	public JResult components(ComponentChanges changes) {
+	public JResult components(DataComponentPatch changes) {
 		this.components = changes;
 		return this;
 	}
 
 	/** Builder-style convenience. */
-	public JResult components(java.util.function.Consumer<ComponentChanges.Builder> build) {
-		ComponentChanges.Builder b = ComponentChanges.builder();
+	public JResult components(java.util.function.Consumer<DataComponentPatch.Builder> build) {
+		DataComponentPatch.Builder b = DataComponentPatch.builder();
 		build.accept(b);
 		this.components = b.build();
 		return this;
@@ -86,7 +85,7 @@ public class JResult {
 		return item;
 	}
 
-	public ComponentChanges getComponents() {
+	public DataComponentPatch getComponents() {
 		return components;
 	}
 

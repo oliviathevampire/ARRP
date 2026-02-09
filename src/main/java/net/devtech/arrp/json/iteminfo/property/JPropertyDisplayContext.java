@@ -1,13 +1,13 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "display_context" string property.
  */
 public class JPropertyDisplayContext extends JProperty {
 	public static final String TYPE = "minecraft:display_context";
-	public static final Codec<JPropertyDisplayContext> CODEC = Codec.unit(JPropertyDisplayContext::new);
+	public static final MapCodec<JPropertyDisplayContext> CODEC = MapCodec.unit(JPropertyDisplayContext::new);
 
 	static {
 		JProperty.register(TYPE, CODEC);

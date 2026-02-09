@@ -22,8 +22,10 @@ import net.devtech.arrp.json.iteminfo.tint.JTintTeam;
 import net.devtech.arrp.json.lang.JLang;
 import net.devtech.arrp.json.models.JModel;
 import net.devtech.arrp.json.models.JTextures;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.devtech.arrp.json.worldgen.dimension.JDimensionType;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.BlockTags;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,11 +39,11 @@ import static net.devtech.arrp.json.models.JModel.*;
 public class RRPPreTest {
 
 	private static Identifier id(String path) {
-		return Identifier.ofVanilla(path);
+		return Identifier.withDefaultNamespace(path);
 	}
 
 	private static Identifier id(String namespace, String path) {
-		return Identifier.of(namespace, path);
+		return Identifier.fromNamespaceAndPath(namespace, path);
 	}
 
 	public static void main(String[] args) {
@@ -59,8 +61,8 @@ public class RRPPreTest {
 						.entry(JRangeEntry.of(10, JModelBasic.of("minecraft:item/charcoal")))
 						.fallback(JModelBasic.of("minecraft:item/coal"))
 				))
-				.fallback(JModelBasic.of("minecraft:block/stone"))), Identifier.of("test", "test_item"));
-		pack.addEquipmentModel(JEquipmentModel.builder().addLayer(LayerType.HUMANOID, JLayer.builder("test:a/test").build()).build(), Identifier.of("test", "test_armor"));
+				.fallback(JModelBasic.of("minecraft:block/stone"))), Identifier.fromNamespaceAndPath("test", "test_item"));
+		pack.addEquipmentModel(JEquipmentModel.builder().addLayer(LayerType.HUMANOID, JLayer.builder("test:a/test").build()).build(), Identifier.fromNamespaceAndPath("test", "test_armor"));
 		pack.dumpDirect(Path.of("aaaa"));
 
 		JState iron_block = state(variant(JState.model(id("block/iron_block"))));
@@ -88,7 +90,7 @@ public class RRPPreTest {
 				.setPrettyPrinting()
 				.create();
 
-		JLang lang = JLang.lang().allPotionOf(Identifier.tryParse("mod_id", "potion_id"), "Example");
+		JLang lang = JLang.lang().allPotionOf(Identifier.fromNamespaceAndPath("mod_id", "potion_id"), "Example");
 
 		System.out.println(RuntimeResourcePackImpl.GSON.toJson(loot("minecraft:block").pool(pool().rolls(1)
 				.entry(entry().type("minecraft:item").name("minecraft:diamond"))
@@ -385,6 +387,33 @@ public class RRPPreTest {
 			));
 			System.out.println("// Connectables.counterLike");
 			System.out.println(JsonBytes.encodeToPrettyString(JState.CODEC, counterLike));
+
+			SkyIslandsWorldgen.main(args);
+
+			System.out.println(JsonBytes.encodeToPrettyString(JDimensionType.CODEC, JDimensionType.dimensionType()
+					.hasFixedTime(false)
+					.hasSkylight(true)
+					.hasCeiling(false)
+					.coordinateScale(1.0)
+					.minY(-64)
+					.height(384)
+					.logicalHeight(384)
+					.infiniburn(BlockTags.INFINIBURN_OVERWORLD)
+					.ambientLight(0.0F)
+					.monsterSpawnLightUniform(0, 7)
+					.monsterSpawnBlockLightLimit(0)
+					.skybox(JDimensionType.Skybox.OVERWORLD)
+					.cardinalLight(JDimensionType.CardinalLightType.DEFAULT)
+					.attribute("minecraft:visual/sky_color", "#78a7ff")
+					.attribute("minecraft:visual/fog_color", "#c0d8ff")
+					.attribute("minecraft:visual/cloud_color", "#ccffffff")
+					.attribute("minecraft:visual/cloud_height", 192.33f)
+					.attribute("minecraft:gameplay/respawn_anchor_works", false)
+					.attribute("minecraft:gameplay/nether_portal_spawns_piglin", true)
+//					.attribute("minecraft:gameplay/bed_rule", BedRule.CODEC, BedRule.CAN_SLEEP_WHEN_DARK)
+//					.attribute("minecraft:audio/background_music", BackgroundMusic.CODEC, BackgroundMusic.OVERWORLD)
+//					.attribute("minecraft:audio/ambient_sounds", AmbientSounds.CODEC, AmbientSounds.LEGACY_CAVE_SETTINGS)
+			));
 		}
 	}
 }

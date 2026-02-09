@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -8,7 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  */
 public class JPropertyUseCycle extends JProperty {
 	public static final String TYPE = "minecraft:use_cycle";
-	public static final Codec<JPropertyUseCycle> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JPropertyUseCycle> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Codec.FLOAT.fieldOf("period").forGetter(JPropertyUseCycle::getPeriod)
 	).apply(i, JPropertyUseCycle::new));
 

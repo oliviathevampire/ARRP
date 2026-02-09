@@ -1,8 +1,8 @@
 package net.devtech.arrp.json.blockstate;
 
-import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.resources.Identifier;
 
 public final class Connectables {
     private Connectables() {}

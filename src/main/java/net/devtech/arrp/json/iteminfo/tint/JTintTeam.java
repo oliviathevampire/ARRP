@@ -2,12 +2,12 @@ package net.devtech.arrp.json.iteminfo.tint;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.ExtraCodecs;
 
 public final class JTintTeam extends JTint {
 	public static final String TYPE = "minecraft:team";
 	public static final Codec<JTintTeam> CODEC = RecordCodecBuilder.create(i -> i.group(
-			Codecs.RGB.fieldOf("default").forGetter(JTintTeam::defaultRgb)
+			ExtraCodecs.RGB_COLOR_CODEC.fieldOf("default").forGetter(JTintTeam::defaultRgb)
 	).apply(i, JTintTeam::new));
 
 	static {

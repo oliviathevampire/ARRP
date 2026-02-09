@@ -3,11 +3,10 @@ package net.devtech.arrp.json.loot;
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import net.minecraft.util.Identifier;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.resources.Identifier;
 
 public class JFunction implements Cloneable {
 	public static final Codec<JFunction> CODEC = new Codec<>() {

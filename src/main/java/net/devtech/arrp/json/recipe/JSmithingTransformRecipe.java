@@ -2,7 +2,7 @@ package net.devtech.arrp.json.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public final class JSmithingTransformRecipe extends JResultRecipe {
 	public static final Codec<JSmithingTransformRecipe> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -14,7 +14,7 @@ public final class JSmithingTransformRecipe extends JResultRecipe {
 
 	static {
 		// Register with your base dispatch: Identifier.CODEC.dispatch("type", …)
-		JRecipe.register(Identifier.ofVanilla("smithing_transform"), CODEC);
+		JRecipe.register(Identifier.withDefaultNamespace("smithing_transform"), CODEC);
 	}
 
 	private final JIngredient base;
@@ -22,7 +22,7 @@ public final class JSmithingTransformRecipe extends JResultRecipe {
 	private final JIngredient template;
 
 	JSmithingTransformRecipe(JIngredient base, JIngredient addition, JIngredient template, JResult result) {
-		super(Identifier.ofVanilla("smithing_transform"), result);
+		super(Identifier.withDefaultNamespace("smithing_transform"), result);
 		this.base = base;
 		this.addition = addition;
 		this.template = template;

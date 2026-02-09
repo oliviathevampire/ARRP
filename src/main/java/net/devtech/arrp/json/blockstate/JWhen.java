@@ -3,9 +3,8 @@ package net.devtech.arrp.json.blockstate;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.state.property.Property;
-
 import java.util.*;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public class JWhen implements Cloneable {// AND-shape: { "prop": "a|b|c", ... }
 	private static final Codec<Map<String, String>> AND_OBJECT =
@@ -90,7 +89,7 @@ public class JWhen implements Cloneable {// AND-shape: { "prop": "a|b|c", ... }
 	public final <T extends Comparable<T>> JWhen add(Property<T> property, T... values) {
 		String[] states = new String[values.length];
 		for (int i = 0; i < values.length; i++) {
-			states[i] = property.name(values[i]);
+			states[i] = property.getName(values[i]);
 		}
 		return this.add(property.getName(), states);
 	}
@@ -161,7 +160,7 @@ public class JWhen implements Cloneable {// AND-shape: { "prop": "a|b|c", ... }
 		public final <T extends Comparable<T>> StateBuilder add(Property<T> property, T... values) {
 			String[] states = new String[values.length];
 			for (int i = 0; i < values.length; i++) {
-				states[i] = property.name(values[i]);
+				states[i] = property.getName(values[i]);
 			}
 			return this.add(property.getName(), states);
 		}

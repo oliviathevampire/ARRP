@@ -1,13 +1,14 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
  * Represents the "minecraft:use_duration" numeric property.
  */
 public class JPropertyUseDuration extends JProperty {
-	public static final Codec<JPropertyUseDuration> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JPropertyUseDuration> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Codec.BOOL.optionalFieldOf("remaining", false).forGetter(JPropertyUseDuration::isRemaining)
 	).apply(i, rem -> new JPropertyUseDuration().remaining(rem)));
 

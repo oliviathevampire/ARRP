@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class JPropertyBlockState extends JProperty {
         return properties;
     }
 
-    public static final Codec<JPropertyBlockState> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JPropertyBlockState> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("properties").forGetter(JPropertyBlockState::getProperties)
     ).apply(i, JPropertyBlockState::new));
 

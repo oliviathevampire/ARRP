@@ -94,7 +94,7 @@ public class JModelSelect extends JItemModel {
 
 	// ---- Registry hook (do this once, e.g., in a static block) ----
 	static {
-		JItemModel.register(TYPE, CODEC.xmap(m -> { m.type = TYPE; return m; }, m -> m));
+		JItemModel.register(TYPE, MapCodec.assumeMapUnsafe(CODEC).xmap(m -> { m.type = TYPE; return m; }, m -> m));
 	}
 
 	private JProperty property;

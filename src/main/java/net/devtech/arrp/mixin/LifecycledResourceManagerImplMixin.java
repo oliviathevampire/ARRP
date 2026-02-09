@@ -3,9 +3,9 @@ package net.devtech.arrp.mixin;
 import com.google.common.collect.Lists;
 import net.devtech.arrp.ARRP;
 import net.devtech.arrp.api.SidedRRPCallback;
-import net.minecraft.resource.LifecycledResourceManagerImpl;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,18 +18,18 @@ import java.util.OptionalInt;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 
-@Mixin(LifecycledResourceManagerImpl.class)
+@Mixin(MultiPackResourceManager.class)
 public abstract class LifecycledResourceManagerImplMixin {
 	private static final Logger ARRP_LOGGER = LogManager.getLogger("ARRP/ReloadableResourceManagerImplMixin");
 
 	@ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
-	private static List<ResourcePack> registerARRPs(List<ResourcePack> packs, ResourceType type, List<ResourcePack> packs0) throws ExecutionException, InterruptedException {
-		List<ResourcePack> copy = new ArrayList<>(packs);
+	private static List<PackResources> registerARRPs(List<PackResources> packs, PackType type, List<PackResources> packs0) throws ExecutionException, InterruptedException {
+		List<PackResources> copy = new ArrayList<>(packs);
 		ARRP.waitForPregen();
 		ARRP_LOGGER.info("ARRP register - before vanilla");
 		SidedRRPCallback.BEFORE_VANILLA.invoker().insert(type, Lists.reverse(copy));
 
-		OptionalInt optionalInt = IntStream.range(0, copy.size()).filter(i -> copy.get(i).getInfo().id().equals("fabric")).findFirst();
+		OptionalInt optionalInt = IntStream.range(0, copy.size()).filter(i -> copy.get(i).location().id().equals("fabric")).findFirst();
 
 		if (optionalInt.isPresent()) {
 			ARRP_LOGGER.info("ARRP register - between vanilla and mods");

@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "fishing_rod/cast" boolean property.
@@ -16,7 +16,7 @@ public class JPropertyFishingRodCast extends JProperty {
         return new JPropertyFishingRodCast();
     }
 
-    public static final Codec<JPropertyFishingRodCast> CODEC = Codec.unit(JPropertyFishingRodCast::new);
+    public static final MapCodec<JPropertyFishingRodCast> CODEC = MapCodec.unit(JPropertyFishingRodCast::new);
 
     static {
         JProperty.register(TYPE, CODEC);

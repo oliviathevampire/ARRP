@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.Optional;
@@ -9,7 +10,7 @@ import java.util.Optional;
  * Represents the "minecraft:local_time" property.
  */
 public class JPropertyLocalTime extends JProperty {
-	public static final Codec<JPropertyLocalTime> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JPropertyLocalTime> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Codec.STRING.optionalFieldOf("locale", "").forGetter(JPropertyLocalTime::getLocale),
 			Codec.STRING.optionalFieldOf("time_zone").forGetter(p -> Optional.ofNullable(p.getTimeZone())),
 			Codec.STRING.optionalFieldOf("pattern").forGetter(p -> Optional.ofNullable(p.getPattern()))

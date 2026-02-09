@@ -3,8 +3,7 @@ package net.devtech.arrp.json.blockstate;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.codec.Codecs;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

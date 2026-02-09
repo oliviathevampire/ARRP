@@ -1,20 +1,19 @@
 package net.devtech.arrp.json.advancement.different;
 
 import com.google.gson.annotations.SerializedName;
-import net.minecraft.advancement.AdvancementCriterion;
-import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.advancement.AdvancementRewards;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.resources.Identifier;
 
 public class JAdvancement {
-    private AdvancementDisplay display;
+    private DisplayInfo display;
     private Identifier parent;
-    private Map<String, AdvancementCriterion<?>> criteria;
+    private Map<String, Criterion<?>> criteria;
     private List<List<String>> requirements;
     private AdvancementRewards rewards;
     @SerializedName("sends_telemetry_event")
@@ -25,7 +24,7 @@ public class JAdvancement {
         return this;
     }
 
-    public JAdvancement display(AdvancementDisplay displayInfo) {
+    public JAdvancement display(DisplayInfo displayInfo) {
         this.display = displayInfo;
         return this;
     }
@@ -35,7 +34,7 @@ public class JAdvancement {
         return this;
     }
 
-    public JAdvancement criteria(String name, AdvancementCriterion<?> criteria) {
+    public JAdvancement criteria(String name, Criterion<?> criteria) {
         if (this.criteria == null) {
             this.criteria = new HashMap<>();
         }

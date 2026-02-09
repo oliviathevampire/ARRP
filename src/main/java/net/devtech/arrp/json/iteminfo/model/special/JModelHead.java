@@ -1,11 +1,11 @@
 package net.devtech.arrp.json.iteminfo.model.special;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.iteminfo.model.JItemModel;
-import net.minecraft.block.SkullBlock;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.SkullBlock;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -15,8 +15,8 @@ import java.util.Optional;
 public class JModelHead extends JModelSpecial {
 	public static final String TYPE = "minecraft:head";
 
-	public static final Codec<JModelHead> CODEC = RecordCodecBuilder.create(i -> i.group(
-			SkullBlock.Type.CODEC.fieldOf("kind").forGetter(m -> m.kind),
+	public static final MapCodec<JModelHead> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+			SkullBlock.Types.CODEC.fieldOf("kind").forGetter(m -> m.kind),
 			Codec.FLOAT.optionalFieldOf("animation", 0.0F).forGetter(m -> m.animation),
 			Identifier.CODEC.optionalFieldOf("texture").forGetter(m -> m.texture)
 	).apply(i, JModelHead::new));
@@ -28,7 +28,7 @@ public class JModelHead extends JModelSpecial {
 		}, m -> m));
 	}
 
-	private SkullBlock.SkullType kind = SkullBlock.Type.PLAYER; // safe default
+	private SkullBlock.Type kind = SkullBlock.Types.PLAYER; // safe default
 	private float animation = 0.0F;
 	private Optional<Identifier> texture = Optional.empty();
 
@@ -36,25 +36,25 @@ public class JModelHead extends JModelSpecial {
 		super(TYPE);
 	}
 
-	public JModelHead(SkullBlock.SkullType kind, float animation, Optional<Identifier> texture) {
+	public JModelHead(SkullBlock.Type kind, float animation, Optional<Identifier> texture) {
 		super(TYPE);
 		this.kind = kind;
 		this.animation = animation;
 		this.texture = texture != null ? texture : Optional.empty();
 	}
 
-	private static SkullBlock.SkullType parseKind(String s) {
+	private static SkullBlock.Type parseKind(String s) {
 		String n = s.toLowerCase(Locale.ROOT);
-		for (var t : SkullBlock.Type.values()) if (t.asString().equals(n)) return t;
+		for (var t : SkullBlock.Types.values()) if (t.getSerializedName().equals(n)) return t;
 		throw new IllegalArgumentException("Unknown head kind: " + s);
 	}
 
 	// ---- API ----
-	public SkullBlock.SkullType getKind() {
+	public SkullBlock.Type getKind() {
 		return kind;
 	}
 
-	public JModelHead kind(SkullBlock.SkullType kind) {
+	public JModelHead kind(SkullBlock.Type kind) {
 		this.kind = kind;
 		return this;
 	}

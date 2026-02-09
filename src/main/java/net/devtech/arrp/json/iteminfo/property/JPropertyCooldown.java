@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:cooldown" numeric property.
@@ -16,7 +16,7 @@ public class JPropertyCooldown extends JProperty {
         return new JPropertyCooldown();
     }
 
-    public static final Codec<JPropertyCooldown> CODEC = Codec.unit(JPropertyCooldown::new);
+    public static final MapCodec<JPropertyCooldown> CODEC = MapCodec.unit(JPropertyCooldown::new);
 
     static {
         JProperty.register(TYPE, CODEC);

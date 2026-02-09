@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class JStonecuttingRecipe extends JRecipe {
 	private final JIngredient ingredient;
@@ -8,7 +8,7 @@ public class JStonecuttingRecipe extends JRecipe {
 	private final int count;
 
 	JStonecuttingRecipe(final JIngredient ingredient, final JStackedResult result) {
-		super(Identifier.ofVanilla("stonecutting"));
+		super(Identifier.withDefaultNamespace("stonecutting"));
 		this.ingredient = ingredient;
 		this.result = result.item;
 		this.count = result.count;

@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:extended_view" boolean property.
@@ -16,7 +16,7 @@ public class JPropertyExtendedView extends JProperty {
         return new JPropertyExtendedView();
     }
 
-    public static final Codec<JPropertyExtendedView> CODEC = Codec.unit(JPropertyExtendedView::new);
+    public static final MapCodec<JPropertyExtendedView> CODEC = MapCodec.unit(JPropertyExtendedView::new);
 
     static {
         JProperty.register(TYPE, CODEC);

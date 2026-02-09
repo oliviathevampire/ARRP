@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.model.special;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.iteminfo.model.JItemModel;
 
@@ -14,7 +15,7 @@ public class JModelShield extends JModelSpecial {
     public static final String TYPE = "minecraft:shield";
 
     // { "pattern": "<ns:path>", "base_texture": "<ns:path>" } — both optional
-    public static final Codec<JModelShield> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JModelShield> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.STRING.optionalFieldOf("pattern").forGetter(s -> Optional.ofNullable(s.pattern)),
             Codec.STRING.optionalFieldOf("base_texture").forGetter(s -> Optional.ofNullable(s.baseTexture))
     ).apply(i, (opPattern, opBase) -> {

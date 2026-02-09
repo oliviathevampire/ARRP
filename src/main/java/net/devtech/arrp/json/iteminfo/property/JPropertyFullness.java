@@ -1,13 +1,13 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:fullness" numeric property.
  */
 public class JPropertyFullness extends JProperty {
 	public static final String TYPE = "minecraft:bundle/fullness";
-	public static final Codec<JPropertyFullness> CODEC = Codec.unit(JPropertyFullness::new);
+	public static final MapCodec<JPropertyFullness> CODEC = MapCodec.unit(JPropertyFullness::new);
 
 	static {
 		JProperty.register(TYPE, CODEC);

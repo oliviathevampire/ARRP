@@ -3,6 +3,7 @@ package net.devtech.arrp.json.iteminfo.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.codec.Codecs;
 import net.devtech.arrp.json.iteminfo.tint.JTint;
@@ -103,8 +104,8 @@ public abstract class JItemModel implements Cloneable {
     // registry of subtype codecs
     private static final Map<String, Codec<? extends JItemModel>> REGISTRY = new ConcurrentHashMap<>();
 
-    public static void register(String type, Codec<? extends JItemModel> codec) {
-        REGISTRY.put(type, codec);
+    public static void register(String type, MapCodec<? extends JItemModel> codec) {
+        REGISTRY.put(type, codec.codec());
     }
 
     /**

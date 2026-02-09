@@ -16,12 +16,26 @@ import net.devtech.arrp.json.models.JModel;
 import net.devtech.arrp.json.models.JTextures;
 import net.devtech.arrp.json.recipe.JRecipe;
 import net.devtech.arrp.json.tags.JTag;
+import net.devtech.arrp.json.timeline.JTimeline;
+import net.devtech.arrp.json.worldgen.biome.JBiome;
+import net.devtech.arrp.json.worldgen.dimension.JDimension;
+import net.devtech.arrp.json.worldgen.dimension.JDimensionType;
+import net.devtech.arrp.json.worldgen.feature.JConfiguredFeature;
+import net.devtech.arrp.json.worldgen.feature.JPlacedFeature;
+import net.devtech.arrp.json.worldgen.noise.JNoiseSettings;
+import net.devtech.arrp.json.worldgen.structure.JStructure;
+import net.devtech.arrp.json.worldgen.structure.JStructureSet;
 import net.devtech.arrp.util.CallableFunction;
 import net.devtech.arrp.util.CountingInputStream;
 import net.devtech.arrp.util.UnsafeByteArrayOutputStream;
-import net.minecraft.resource.*;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.*;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.resources.IoSupplier;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -53,7 +67,7 @@ import static java.lang.String.valueOf;
  */
 @Deprecated
 @ApiStatus.Internal
-public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements RuntimeResourcePack {
+public class RuntimeResourcePackImpl extends AbstractPackResources implements RuntimeResourcePack {
 	public static final ExecutorService EXECUTOR_SERVICE;
 	public static final boolean DUMP;
 	public static final boolean DEBUG_PERFORMANCE;
@@ -113,13 +127,13 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	private final Map<Identifier, JLang> langMergable = new ConcurrentHashMap<>();
 
 	public RuntimeResourcePackImpl(Identifier id) {
-		super(new ResourcePackInfo(id.getNamespace() + ";" + id.getPath(), Text.of("Runtime Resource Pack " + id), ResourcePackSource.NONE, Optional.empty()));
+		super(new PackLocationInfo(id.getNamespace() + ";" + id.getPath(), Component.nullToEmpty("Runtime Resource Pack " + id), PackSource.DEFAULT, Optional.empty()));
 		this.id = id;
 	}
 
 	@Override
 	public void addRecoloredImage(Identifier identifier, InputStream target, IntUnaryOperator operator) {
-		this.addLazyResource(ResourceType.CLIENT_RESOURCES, fix(identifier, "textures", "png"), (i, r) -> {
+		this.addLazyResource(PackType.CLIENT_RESOURCES, fix(identifier, "textures", "png"), (i, r) -> {
 			try {
 
 				// optimize buffer allocation, input and output image after recoloring should be roughly the same size
@@ -154,7 +168,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 			if (lang1 == null) {
 				lang1 = new JLang();
 				JLang finalLang = lang1;
-				this.addLazyResource(ResourceType.CLIENT_RESOURCES, identifier, (pack, identifier2) -> {
+				this.addLazyResource(PackType.CLIENT_RESOURCES, identifier, (pack, identifier2) -> {
 					return pack.addLang(identifier, finalLang);
 				});
 			}
@@ -169,7 +183,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	@Override
-	public Future<byte[]> addAsyncResource(ResourceType type, Identifier path, CallableFunction<Identifier, byte[]> data) {
+	public Future<byte[]> addAsyncResource(PackType type, Identifier path, CallableFunction<Identifier, byte[]> data) {
 		Future<byte[]> future = EXECUTOR_SERVICE.submit(() -> data.get(path));
 		this.getSys(type).put(path, () -> {
 			try {
@@ -182,12 +196,12 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	@Override
-	public void addLazyResource(ResourceType type, Identifier path, BiFunction<RuntimeResourcePack, Identifier, byte[]> func) {
+	public void addLazyResource(PackType type, Identifier path, BiFunction<RuntimeResourcePack, Identifier, byte[]> func) {
 		this.getSys(type).put(path, new Memoized<>(func, path));
 	}
 
 	@Override
-	public byte[] addResource(ResourceType type, Identifier path, byte[] data) {
+	public byte[] addResource(PackType type, Identifier path, byte[] data) {
 		this.getSys(type).put(path, () -> data);
 		return data;
 	}
@@ -218,12 +232,12 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 
 	@Override
 	public byte[] addAsset(Identifier path, byte[] data) {
-		return this.addResource(ResourceType.CLIENT_RESOURCES, path, data);
+		return this.addResource(PackType.CLIENT_RESOURCES, path, data);
 	}
 
 	@Override
 	public byte[] addData(Identifier path, byte[] data) {
-		return this.addResource(ResourceType.SERVER_DATA, path, data);
+		return this.addResource(PackType.SERVER_DATA, path, data);
 	}
 
 	@Override
@@ -278,6 +292,51 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	@Override
+	public byte[] addTimeline(Identifier id, JTimeline timeline) {
+		return this.addData(fix(id, "timelines", "json"), JsonBytes.encodeToPrettyBytes(JTimeline.CODEC, timeline));
+	}
+
+	@Override
+	public byte[] addBiome(Identifier id, JBiome biome) {
+		return this.addData(fix(id, "worldgen/biome", "json"), JsonBytes.encodeToPrettyBytes(JBiome.CODEC, biome));
+	}
+
+	@Override
+	public byte[] addDimension(Identifier id, JDimension dimension) {
+		return this.addData(fix(id, "dimension", "json"), JsonBytes.encodeToPrettyBytes(JDimension.CODEC, dimension));
+	}
+
+	@Override
+	public byte[] addDimensionType(Identifier id, JDimensionType dimensionType) {
+		return this.addData(fix(id, "dimension_type", "json"), JsonBytes.encodeToPrettyBytes(JDimensionType.CODEC, dimensionType));
+	}
+
+	@Override
+	public byte[] addConfiguredFeature(Identifier id, JConfiguredFeature configuredFeature) {
+		return this.addData(fix(id, "worldgen/configured_feature", "json"), JsonBytes.encodeToPrettyBytes(JConfiguredFeature.CODEC, configuredFeature));
+	}
+
+	@Override
+	public byte[] addPlacedFeature(Identifier id, JPlacedFeature placedFeature) {
+		return this.addData(fix(id, "worldgen/placed_feature", "json"), JsonBytes.encodeToPrettyBytes(JPlacedFeature.CODEC, placedFeature));
+	}
+
+	@Override
+	public byte[] addNoiseSettings(Identifier id, JNoiseSettings noiseSettings) {
+		return this.addData(fix(id, "worldgen/noise_settings", "json"), JsonBytes.encodeToPrettyBytes(JNoiseSettings.CODEC, noiseSettings));
+	}
+
+	@Override
+	public byte[] addStructure(Identifier id, JStructure structure) {
+		return this.addData(fix(id, "worldgen/structure", "json"), JsonBytes.encodeToPrettyBytes(JStructure.CODEC, structure));
+	}
+
+	@Override
+	public byte[] addStructureSet(Identifier id, JStructureSet structureSet) {
+		return this.addData(fix(id, "worldgen/structure_set", "json"), JsonBytes.encodeToPrettyBytes(JStructureSet.CODEC, structureSet));
+	}
+
+	@Override
 	public Future<?> async(Consumer<RuntimeResourcePack> action) {
 		this.lock();
 		return EXECUTOR_SERVICE.submit(() -> {
@@ -288,7 +347,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 
 	@Override
 	public void dumpDirect(Path output) {
-		LOGGER.info("dumping " + this.id + "'s assets and data");
+		LOGGER.info("dumping {}'s assets and data", this.id);
 		// data dump time
 		try {
 			for (Map.Entry<List<String>, Supplier<byte[]>> e : this.root.entrySet()) {
@@ -298,7 +357,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 					Files.createDirectories(path.getParent());
 					Files.write(path, e.getValue().get());
 				} else {
-					LOGGER.error("RRP contains out-of-directory path! \"" + pathStr + "\"");
+					LOGGER.error("RRP contains out-of-directory path! \"{}\"", pathStr);
 				}
 			}
 
@@ -387,7 +446,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	 * @return the pack.png image as a stream
 	 */
 	@Override
-	public InputSupplier<InputStream> openRoot(String... segments) {
+	public IoSupplier<InputStream> getRootResource(String... segments) {
 		this.lock();
 		Supplier<byte[]> supplier = this.root.get(Arrays.asList(segments));
 		if (supplier == null) {
@@ -399,7 +458,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	@Override
-	public InputSupplier<InputStream> open(ResourceType type, Identifier id) {
+	public IoSupplier<InputStream> getResource(PackType type, Identifier id) {
 		this.lock();
 		Supplier<byte[]> supplier = this.getSys(type).get(id);
 		if (supplier == null) {
@@ -412,7 +471,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	@Override
-	public void findResources(ResourceType type, String namespace, String prefix, ResultConsumer consumer) {
+	public void listResources(PackType type, String namespace, String prefix, ResourceOutput consumer) {
 		this.lock();
 		for (Identifier identifier : this.getSys(type).keySet()) {
 			Supplier<byte[]> supplier = this.getSys(type).get(identifier);
@@ -421,7 +480,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 				this.waiting.unlock();
 				continue;
 			}
-			InputSupplier<InputStream> inputSupplier = () -> new ByteArrayInputStream(supplier.get());
+			IoSupplier<InputStream> inputSupplier = () -> new ByteArrayInputStream(supplier.get());
 			if (identifier.getNamespace().equals(namespace) && identifier.getPath().startsWith(prefix)) {
 				consumer.accept(identifier, inputSupplier);
 			}
@@ -430,7 +489,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	@Override
-	public Set<String> getNamespaces(ResourceType type) {
+	public Set<String> getNamespaces(PackType type) {
 		this.lock();
 		Set<String> namespaces = new HashSet<>();
 		for (Identifier identifier : this.getSys(type).keySet()) {
@@ -467,7 +526,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 	}
 
 	private static Identifier fix(Identifier identifier, String prefix, String append) {
-		return Identifier.of(identifier.getNamespace(), prefix + '/' + identifier.getPath() + '.' + append);
+		return Identifier.fromNamespaceAndPath(identifier.getNamespace(), prefix + '/' + identifier.getPath() + '.' + append);
 	}
 
 	protected byte[] read(ZipEntry entry, InputStream stream) throws IOException {
@@ -482,7 +541,7 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 		int sep = fullPath.indexOf('/');
 		String namespace = fullPath.substring(0, sep);
 		String path = fullPath.substring(sep + 1);
-		map.put(Identifier.of(namespace, path), () -> data);
+		map.put(Identifier.fromNamespaceAndPath(namespace, path), () -> data);
 	}
 
 	private void lock() {
@@ -517,8 +576,8 @@ public class RuntimeResourcePackImpl extends AbstractFileResourcePack implements
 		}
 	}
 
-	private Map<Identifier, Supplier<byte[]>> getSys(ResourceType side) {
-		return side == ResourceType.CLIENT_RESOURCES ? this.assets : this.data;
+	private Map<Identifier, Supplier<byte[]>> getSys(PackType side) {
+		return side == PackType.CLIENT_RESOURCES ? this.assets : this.data;
 	}
 
 	private class Memoized<T> implements Supplier<byte[]> {

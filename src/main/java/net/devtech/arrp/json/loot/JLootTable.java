@@ -2,11 +2,10 @@ package net.devtech.arrp.json.loot;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.resources.Identifier;
 
 public class JLootTable implements Cloneable {
 	public static final Codec<JLootTable> CODEC = RecordCodecBuilder.create(i -> i.group(

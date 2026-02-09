@@ -3,11 +3,10 @@ package net.devtech.arrp.json.advancement;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.Map;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public final class AdvConditions {
 	private AdvConditions() {
@@ -75,7 +74,7 @@ public final class AdvConditions {
 			ItemPredicate p = new ItemPredicate();
 			JsonArray arr = new JsonArray();
 			for (Item id : itemIds) {
-				arr.add(Registries.ITEM.getId(id).toString());
+				arr.add(BuiltInRegistries.ITEM.getKey(id).toString());
 			}
 			p.obj.add("items", arr);
 			return p;

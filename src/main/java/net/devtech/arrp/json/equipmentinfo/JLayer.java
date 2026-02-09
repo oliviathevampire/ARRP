@@ -3,9 +3,8 @@ package net.devtech.arrp.json.equipmentinfo;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.Identifier;
-
 import java.util.Optional;
+import net.minecraft.resources.Identifier;
 
 public final class JLayer {
 	public static final Codec<JLayer> CODEC = RecordCodecBuilder.create(i -> i.group(

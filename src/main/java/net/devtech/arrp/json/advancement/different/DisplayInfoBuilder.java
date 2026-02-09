@@ -1,30 +1,29 @@
 package net.devtech.arrp.json.advancement.different;
 
-import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.advancement.AdvancementFrame;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.AssetInfo;
-
 import java.util.Optional;
+import net.minecraft.advancements.AdvancementType;
+import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.core.ClientAsset;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class DisplayInfoBuilder {
-    private Text title;
-    private Text description;
+    private Component title;
+    private Component description;
     private ItemStack icon;
-    private AssetInfo background;
-    private AdvancementFrame type;
+    private ClientAsset.ResourceTexture background;
+    private AdvancementType type;
     private boolean showToast;
     private boolean announceChat;
     private boolean hidden;
 
-    public DisplayInfoBuilder title(Text title) {
+    public DisplayInfoBuilder title(Component title) {
         this.title = title;
         return this;
     }
 
-    public DisplayInfoBuilder description(Text description) {
+    public DisplayInfoBuilder description(Component description) {
         this.description = description;
         return this;
     }
@@ -39,12 +38,12 @@ public class DisplayInfoBuilder {
         return this;
     }
 
-    public DisplayInfoBuilder background(AssetInfo background) {
+    public DisplayInfoBuilder background(ClientAsset.ResourceTexture background) {
         this.background = background;
         return this;
     }
 
-    public DisplayInfoBuilder type(AdvancementFrame type) {
+    public DisplayInfoBuilder type(AdvancementType type) {
         this.type = type;
         return this;
     }
@@ -64,8 +63,8 @@ public class DisplayInfoBuilder {
         return this;
     }
 
-    public AdvancementDisplay build() {
-        return new AdvancementDisplay(this.icon, this.title, this.description, Optional.ofNullable(this.background), this.type,
+    public DisplayInfo build() {
+        return new DisplayInfo(this.icon, this.title, this.description, Optional.ofNullable(this.background), this.type,
                 this.showToast, this.announceChat, this.hidden);
     }
 }

@@ -3,20 +3,20 @@ package net.devtech.arrp.api;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.resource.InputSupplier;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.IoSupplier;
 
 /**
- * The special version of {@code InputSupplier<InputStream>} that may be returned by {@link net.minecraft.resource.ResourcePack#open(ResourceType, Identifier)} which provides an instance resource.
+ * The special version of {@code InputSupplier<InputStream>} that may be returned by {@link net.minecraft.server.packs.PackResources#getResource(PackType, Identifier)} which provides an instance resource.
  *
  * @param <T> The type of the instant resource.
  */
-public interface ImmediateInputSupplier<T> extends InputSupplier<InputStream> {
+public interface ImmediateInputSupplier<T> extends IoSupplier<InputStream> {
   Logger LOGGER = LoggerFactory.getLogger(ImmediateInputSupplier.class);
 
   T resource();

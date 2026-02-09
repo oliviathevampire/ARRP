@@ -24,8 +24,8 @@
     "arrp.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.14",
-    "minecraft": ">=1.21.4"
+    "fabricloader": ">=0.18.3",
+    "minecraft": ">=26.1-alpha.1"
   },
   "custom": {
     "modmenu": {

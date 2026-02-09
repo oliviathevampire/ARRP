@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public abstract class JResultRecipe extends JRecipe {
 	private final JResult result;

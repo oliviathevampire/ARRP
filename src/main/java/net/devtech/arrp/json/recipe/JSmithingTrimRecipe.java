@@ -2,7 +2,7 @@ package net.devtech.arrp.json.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public final class JSmithingTrimRecipe extends JRecipe {
 	// Codec: { "template", "base", "addition" }  (no "result")
@@ -13,7 +13,7 @@ public final class JSmithingTrimRecipe extends JRecipe {
 	).apply(i, JSmithingTrimRecipe::new));
 
 	static {
-		JRecipe.register(Identifier.ofVanilla("smithing_trim"), CODEC);
+		JRecipe.register(Identifier.withDefaultNamespace("smithing_trim"), CODEC);
 	}
 
 	private final JIngredient base;
@@ -21,7 +21,7 @@ public final class JSmithingTrimRecipe extends JRecipe {
 	private final JIngredient template;
 
 	JSmithingTrimRecipe(JIngredient base, JIngredient addition, JIngredient template) {
-		super(Identifier.ofVanilla("smithing_trim"));
+		super(Identifier.withDefaultNamespace("smithing_trim"));
 		this.base = base;
 		this.addition = addition;
 		this.template = template;

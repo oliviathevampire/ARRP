@@ -1,6 +1,6 @@
 package net.devtech.arrp.json.models;
 
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 public class JFace implements Cloneable {
 	private final float[] uv = new float[4];
@@ -25,7 +25,7 @@ public class JFace implements Cloneable {
 	}
 
 	public JFace cullface(Direction direction) {
-		this.cullface = direction.asString();
+		this.cullface = direction.getSerializedName();
 		return this;
 	}
 

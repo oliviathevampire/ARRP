@@ -2,10 +2,9 @@ package net.devtech.arrp.json.tags;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.resources.Identifier;
 
 public class JTag {
 	public static final Codec<JTag> CODEC = RecordCodecBuilder.create(instance -> instance.group(

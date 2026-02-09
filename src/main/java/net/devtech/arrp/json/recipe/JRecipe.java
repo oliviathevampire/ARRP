@@ -2,8 +2,7 @@ package net.devtech.arrp.json.recipe;
 
 import com.mojang.serialization.Codec;
 import net.devtech.arrp.json.codec.Codecs;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,7 +35,7 @@ public abstract class JRecipe implements Cloneable {
 	/** Convenience: default base to tag #minecraft:trimmable_armor. */
 	public static JSmithingTrimRecipe smithingTrim(final JIngredient addition, final JIngredient template) {
 		return new JSmithingTrimRecipe(
-				JIngredient.ingredient().tag(Identifier.ofVanilla("trimmable_armor")),
+				JIngredient.ingredient().tag(Identifier.withDefaultNamespace("trimmable_armor")),
 				addition, template
 		);
 	}

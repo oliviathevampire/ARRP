@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.property;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -9,7 +10,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  */
 public class JPropertyHasComponent extends JProperty {
 	public static final String TYPE = "minecraft:has_component";
-	public static final Codec<JPropertyHasComponent> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JPropertyHasComponent> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Codec.STRING.fieldOf("component").forGetter(JPropertyHasComponent::getComponent),
 			Codec.BOOL.optionalFieldOf("ignore_default", false).forGetter(JPropertyHasComponent::shouldIgnoreDefault)
 	).apply(i, JPropertyHasComponent::of));

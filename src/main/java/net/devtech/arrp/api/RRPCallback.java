@@ -3,14 +3,13 @@ package net.devtech.arrp.api;
 import net.devtech.arrp.util.IrremovableList;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.resource.ResourcePack;
-
+import net.minecraft.server.packs.PackResources;
 import java.util.List;
 import java.util.function.Function;
 
 public interface RRPCallback {
 	Function<RRPCallback[], RRPCallback> CALLBACK_FUNCTION = r -> rs -> {
-		IrremovableList<ResourcePack> packs = new IrremovableList<>(rs, $ -> {});
+		IrremovableList<PackResources> packs = new IrremovableList<>(rs, $ -> {});
 		for (RRPCallback callback : r) {
 			callback.insert(packs);
 		}
@@ -45,5 +44,5 @@ public interface RRPCallback {
 	/**
 	 * you can only add resource packs to this list, you may not remove them
 	 */
-	void insert(List<ResourcePack> resources);
+	void insert(List<PackResources> resources);
 }

@@ -2,17 +2,16 @@ package net.devtech.arrp.json.advancement;// imports (Yarn names)
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.util.StringRepresentable;
 
 public final class JDisplay {
 	public static final Codec<JDisplay> CODEC = RecordCodecBuilder.create(i -> i.group(
 			JIcon.CODEC.fieldOf("icon").forGetter(d -> d.icon),
-			TextCodecs.CODEC.fieldOf("title").forGetter(d -> d.title),
-			TextCodecs.CODEC.fieldOf("description").forGetter(d -> d.description),
+			ComponentSerialization.CODEC.fieldOf("title").forGetter(d -> d.title),
+			ComponentSerialization.CODEC.fieldOf("description").forGetter(d -> d.description),
 			Codec.STRING.optionalFieldOf("background").forGetter(d -> Optional.ofNullable(d.background)),
 			Frame.CODEC.optionalFieldOf("frame", Frame.TASK).forGetter(d -> d.frame),
 			Codec.BOOL.optionalFieldOf("show_toast").forGetter(d -> Optional.ofNullable(d.showToast)),
@@ -31,8 +30,8 @@ public final class JDisplay {
 		return d;
 	}));
 	public JIcon icon;
-	public Text title;
-	public Text description;
+	public Component title;
+	public Component description;
 	public String background;
 	public Frame frame = Frame.TASK;
 	public Boolean showToast, announceChat, hidden;
@@ -42,12 +41,12 @@ public final class JDisplay {
 		return this;
 	}
 
-	public JDisplay title(Text title) {
+	public JDisplay title(Component title) {
 		this.title = title;
 		return this;
 	}
 
-	public JDisplay description(Text description) {
+	public JDisplay description(Component description) {
 		this.description = description;
 		return this;
 	}
@@ -77,12 +76,12 @@ public final class JDisplay {
 		return this;
 	}
 
-	public enum Frame implements StringIdentifiable {
+	public enum Frame implements StringRepresentable {
 		TASK("task"),
 		GOAL("goal"),
 		CHALLENGE("challenge");
 
-		public static final Codec<Frame> CODEC = StringIdentifiable.createCodec(Frame::values);
+		public static final Codec<Frame> CODEC = StringRepresentable.fromEnum(Frame::values);
 
 		private final String id;
 
@@ -91,7 +90,7 @@ public final class JDisplay {
 		}
 
 		@Override
-		public String asString() {
+		public String getSerializedName() {
 			return id;
 		}
 	}

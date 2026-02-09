@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.property;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -36,7 +37,7 @@ public class JPropertyAngle extends JProperty {
         return wobble;
     }
 
-    public static final Codec<JPropertyAngle> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JPropertyAngle> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.BOOL.fieldOf("wobble").forGetter(JPropertyAngle::isWobble)
     ).apply(i, JPropertyAngle::new));
 

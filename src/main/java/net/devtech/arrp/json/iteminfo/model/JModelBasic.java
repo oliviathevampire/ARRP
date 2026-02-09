@@ -1,6 +1,7 @@
 package net.devtech.arrp.json.iteminfo.model;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.devtech.arrp.json.iteminfo.tint.JTint;
 
@@ -9,7 +10,7 @@ import net.devtech.arrp.json.iteminfo.tint.JTint;
  */
 public class JModelBasic extends JItemModel {
 	public static final String TYPE = "minecraft:model";
-	public static final Codec<JModelBasic> CODEC = RecordCodecBuilder.create(i -> i.group(
+	public static final MapCodec<JModelBasic> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			// base fields first
 			JTint.CODEC.listOf().optionalFieldOf("tints").forGetter(JModelBasic::codecGetTints),
 			LAZY_SELF.optionalFieldOf("fallback").forGetter(JModelBasic::codecGetFallback),

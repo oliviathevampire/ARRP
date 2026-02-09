@@ -1,13 +1,13 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "minecraft:throwing" boolean property.
  */
 public class JPropertyThrowing extends JProperty {
 	// empty object -> only "property" is emitted
-	public static final Codec<JPropertyThrowing> CODEC = Codec.unit(JPropertyThrowing::new);
+	public static final MapCodec<JPropertyThrowing> CODEC = MapCodec.unit(JPropertyThrowing::new);
 
 	static {
 		JProperty.register("minecraft:throwing", CODEC);

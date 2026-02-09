@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.property;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.devtech.arrp.json.codec.Codecs;
 
 import java.util.Map;
@@ -31,8 +32,8 @@ public abstract class JProperty {
     // ===== Registry + base codec =====
 
     private static final Map<String, Codec<? extends JProperty>> REGISTRY = new ConcurrentHashMap<>();
-    public static void register(String property, Codec<? extends JProperty> codec) {
-        REGISTRY.put(property, codec);
+    public static void register(String property, MapCodec<? extends JProperty> codec) {
+        REGISTRY.put(property, codec.codec());
     }
 
     public static final Codec<JProperty> CODEC = Codecs.tagged("property", JProperty::getPropertyType, REGISTRY::get);

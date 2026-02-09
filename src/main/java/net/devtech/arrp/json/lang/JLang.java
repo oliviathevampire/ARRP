@@ -1,17 +1,16 @@
 package net.devtech.arrp.json.lang;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 public class JLang implements Cloneable {
     private final Map<String, String> lang = new HashMap<>();
@@ -28,7 +27,7 @@ public class JLang implements Cloneable {
 
     private <T> JLang object(Registry<T> registry, String str, T t, String name) {
         return this.object(str,
-                Objects.requireNonNull(registry.getId(t), "register your item before calling this"),
+                Objects.requireNonNull(registry.getKey(t), "register your item before calling this"),
                 name);
     }
 
@@ -44,35 +43,35 @@ public class JLang implements Cloneable {
 
 
     /**
-     * adds a translation key for an item, respects {@link Item#getTranslationKey()}
+     * adds a translation key for an item, respects {@link Item#getDescriptionId()}
      */
     public JLang itemRespect(Item item, String name) {
-        this.lang.put(item.getTranslationKey(), name);
+        this.lang.put(item.getDescriptionId(), name);
         return this;
     }
 
     public JLang item(ItemStack stack, String name) {
-        this.lang.put(stack.getItem().getTranslationKey(), name);
+        this.lang.put(stack.getItem().getDescriptionId(), name);
         return this;
     }
 
     /**
-     * adds a translation key for an block, respects {@link Block#getTranslationKey()}
+     * adds a translation key for an block, respects {@link Block#getDescriptionId()}
      */
     public JLang blockRespect(Block block, String name) {
-        this.lang.put(block.getTranslationKey(), name);
+        this.lang.put(block.getDescriptionId(), name);
         return this;
     }
 
     public JLang fluid(Fluid fluid, String name) {
-        return this.object(Registries.FLUID, "fluid", fluid, name);
+        return this.object(BuiltInRegistries.FLUID, "fluid", fluid, name);
     }
 
     /**
-     * adds a translation key for an entity, respects {@link EntityType#getTranslationKey()}
+     * adds a translation key for an entity, respects {@link EntityType#getDescriptionId()}
      */
     public JLang entityRespect(EntityType<?> type, String name) {
-        this.lang.put(type.getTranslationKey(), name);
+        this.lang.put(type.getDescriptionId(), name);
         return this;
     }
 

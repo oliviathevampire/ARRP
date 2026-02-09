@@ -1,12 +1,12 @@
 package net.devtech.arrp.json.iteminfo.property;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Represents the "trim_material" string property.
  */
 public class JPropertyTrimMaterial extends JProperty {
-	public static final Codec<JPropertyTrimMaterial> CODEC = Codec.unit(JPropertyTrimMaterial::new);
+	public static final MapCodec<JPropertyTrimMaterial> CODEC = MapCodec.unit(JPropertyTrimMaterial::new);
 
 	static {
 		JProperty.register("minecraft:trim_material", CODEC);

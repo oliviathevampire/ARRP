@@ -3,7 +3,7 @@ package net.devtech.arrp.json.iteminfo.tint;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.ExtraCodecs;
 
 /** minecraft:firework — Average firework colors or default. Fields: default (RGB) */
 public final class JTintFirework extends JTint {
@@ -19,7 +19,7 @@ public final class JTintFirework extends JTint {
     public int defaultRgb() { return def; }
 
     public static final Codec<JTintFirework> CODEC = RecordCodecBuilder.create(i -> i.group(
-        Codecs.RGB.fieldOf("default").forGetter(JTintFirework::defaultRgb)
+        ExtraCodecs.RGB_COLOR_CODEC.fieldOf("default").forGetter(JTintFirework::defaultRgb)
     ).apply(i, JTintFirework::new));
 
     static { JTint.register(TYPE, CODEC); }

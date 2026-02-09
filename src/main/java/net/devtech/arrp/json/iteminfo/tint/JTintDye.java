@@ -2,7 +2,7 @@ package net.devtech.arrp.json.iteminfo.tint;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.ExtraCodecs;
 
 /** Uses dye color when present; otherwise `default` RGB. */
 public final class JTintDye extends JTint {
@@ -22,7 +22,7 @@ public final class JTintDye extends JTint {
     }
 
     public static final Codec<JTintDye> CODEC = RecordCodecBuilder.create(i -> i.group(
-        Codecs.RGB.fieldOf("default").forGetter(JTintDye::defaultRgb)
+        ExtraCodecs.RGB_COLOR_CODEC.fieldOf("default").forGetter(JTintDye::defaultRgb)
     ).apply(i, JTintDye::new));
 
     static { JTint.register(TYPE, CODEC); }

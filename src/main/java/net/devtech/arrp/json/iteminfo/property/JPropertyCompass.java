@@ -2,6 +2,7 @@ package net.devtech.arrp.json.iteminfo.property;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -51,7 +52,7 @@ public class JPropertyCompass extends JProperty {
         return this;
     }
 
-    public static final Codec<JPropertyCompass> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<JPropertyCompass> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.STRING.fieldOf("target").forGetter(JPropertyCompass::getTarget),
             Codec.BOOL.optionalFieldOf("wobble", true).forGetter(JPropertyCompass::shouldWobble)
     ).apply(i, JPropertyCompass::of));
